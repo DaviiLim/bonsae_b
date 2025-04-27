@@ -11,7 +11,7 @@ export class SchoolPeriodsController {
   create(@Body() createSchoolPeriodDto: CreateSchoolPeriodDto) {
     return this.schoolPeriodsService.create(createSchoolPeriodDto);
   }
-
+  
   @Get()
   findAll() {
     return this.schoolPeriodsService.findAll();

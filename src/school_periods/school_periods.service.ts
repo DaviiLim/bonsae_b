@@ -30,14 +30,18 @@ export class SchoolPeriodsService {
 
   async update(id: string, updateSchoolPeriodDto: UpdateSchoolPeriodDto): Promise<SchoolPeriod> {
     const updatedPeriod = await this.schoolPeriodModel
-      .findByIdAndUpdate(id, updateSchoolPeriodDto, { new: true })
+      .findByIdAndUpdate(
+        id,
+        updateSchoolPeriodDto, 
+        { new: true } 
+      )
       .exec();
   
     if (!updatedPeriod) {
-      throw new HttpException('O Período letivo não foi encontrado!', HttpStatus.NOT_FOUND);
+      throw new HttpException('Período letivo não foi encontrado!', HttpStatus.NOT_FOUND);
     }
   
-    return updatedPeriod;  
+    return updatedPeriod;
   }
 
   async remove(id: string): Promise<SchoolPeriod> {
@@ -51,4 +55,5 @@ export class SchoolPeriodsService {
   
     return updatedDeletedPeriod;  
   }
+  
 }
