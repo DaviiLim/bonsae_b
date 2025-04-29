@@ -10,8 +10,12 @@ import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
-    PeriodoLetivoModule,
-    MongooseModule.forRoot('mongodb://localhost:27017/bonsae_db')
+    MongooseModule.forRoot('mongodb://localhost:27017/bonsae_db'),
+    SchoolPeriodsModule,
+    AcademicClassesModule,
+    DisciplinesModule,
+    DisciplineUsersModule,
+    UsersModule
   ],
   controllers: [AppController],
   providers: [AppService],
