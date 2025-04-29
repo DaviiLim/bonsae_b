@@ -1,26 +1,41 @@
 import { Injectable } from '@nestjs/common';
-import { CreateDisciplineUserDto } from './dto/create-discipline_user.dto';
-import { UpdateDisciplineUserDto } from './dto/update-discipline_user.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { Discipline } from 'src/disciplines/entities/discipline.entity';
+import { CreateDisciplineUserDto } from 'src/discipline_users/dto/create-discipline_user.dto';
 
 @Injectable()
 export class DisciplineUsersService {
-  create(createDisciplineUserDto: CreateDisciplineUserDto) {
-    return 'This action adds a new disciplineUser';
+  constructor(
+    @InjectModel(CreateUserDto.name) private userModel: Model<CreateUserDto>,
+    @InjectModel(Discipline.name) private disciplineModel: Model<Discipline>,
+  ) {}
+
+  async vincularUsuario(data: CreateDisciplineUserDto) {
+    const { userId, disciplineId } = data;
+
+    await this.userModel.findByIdAndUpdate(
+      userId,
+      { $addToSet: { disciplines: disciplineId } }, // Adiciona ao array sem duplicar
+      { new: true },
+    );
+
+    await this.disciplineModel.findByIdAndUpdate(
+      disciplineId,
+      { $addToSet: { users: userId } },
+      { new: true },
+    );
+
+    return { message: 'Usuário vinculado à disciplina com sucesso!' };
   }
 
-  findAll() {
-    return `This action returns all disciplineUsers`;
-  }
+  async desvincularUsuario(data: CreateDisciplineUserDto) {
+    const { userId, disciplineId } = data;
 
-  findOne(id: number) {
-    return `This action returns a #${id} disciplineUser`;
-  }
+    await this.userModel.findByIdAndUpdate(userId, { $pull: { disciplines: disciplineId } });
+    await this.disciplineModel.findByIdAndUpdate(disciplineId, { $pull: { users: userId } });
 
-  update(id: number, updateDisciplineUserDto: UpdateDisciplineUserDto) {
-    return `This action updates a #${id} disciplineUser`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} disciplineUser`;
+    return { message: 'Usuário desvinculado da disciplina!' };
   }
 }
