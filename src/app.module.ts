@@ -9,7 +9,7 @@ import { MongooseModule } from '@nestjs/mongoose';
   imports: [
     PeriodoLetivoModule,
     DisciplinasModule,
-    MongooseModule.forRoot('mongodb://localhost:27017/bonsae_db')
+    MongooseModule.forRoot('mongodb://bonsae:bonsae@mongo:27017/bonsae')
   ],
   controllers: [AppController],
   providers: [AppService],
