@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: bonsae-app
+    ports:
+      - '3000:3000'
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://bonsae:bonsae@mongo:27017/bonsae
+
+  mongo:
+    image: mongo:6
+    container_name: bonsae-mongo
+    ports:
+      - '27017:27017'
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+      - MONGO_INITDB_DATABASE=bonsae
+      - MONGO_INITDB_USERNAME=bonsae
+      - MONGO_INITDB_PASSWORD=bonsae
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
