@@ -1,57 +1,67 @@
-### API REST BONSAE
+## API REST BONSAE
 
-## CREATE
+## ACADEMIC-CLASSES
+
+### CREATE
 http://localhost:3000/academic-classes
-## UPDATE 
+### UPDATE 
 http://localhost:3000/academic-classes
-## READ
+### READ
 http://localhost:3000/academic-classes
-## READ / ID
+### READ / ID
 http://localhost:3000/academic-classes/id
-## DELETE
+### DELETE
 http://localhost:3000/academic-classes/id
 
-## CREATE
+## DISCIPLINE-USERS
+
+### CREATE
 http://localhost:3000/discipline-users
-## UPDATE 
+### UPDATE 
 http://localhost:3000/discipline-users
-## READ
+### READ
 http://localhost:3000/discipline-users
 ## READ / ID
 http://localhost:3000/discipline-users/id
-## DELETE
+### DELETE
 http://localhost:3000/discipline-users/id
 
-## CREATE
+## DISCIPLINES
+
+### CREATE
 http://localhost:3000/disciplines
-## UPDATE 
+### UPDATE 
 http://localhost:3000/disciplines
-## READ
+### READ
 http://localhost:3000/disciplines
 ## READ / ID
 http://localhost:3000/disciplines/id
-## DELETE
+### DELETE
 http://localhost:3000/disciplines/id
 
-## CREATE
+## SCHOOL-PERIODS
+
+### CREATE
 http://localhost:3000/school-periods
-## UPDATE 
+### UPDATE 
 http://localhost:3000/school-periods
-## READ
+### READ
 http://localhost:3000/school-periods
-## READ / ID
+### READ / ID
 http://localhost:3000/school-periods/id
-## DELETE
+### DELETE
 http://localhost:3000/school-periods/id
 
-## CREATE
+## USERS
+
+### CREATE
 http://localhost:3000/users
-## UPDATE 
+### UPDATE 
 http://localhost:3000/users
-## READ
+### READ
 http://localhost:3000/users
-## READ / ID
+### READ / ID
 http://localhost:3000/users/id
-## DELETE
+### DELETE
 http://localhost:3000/users/id
 
