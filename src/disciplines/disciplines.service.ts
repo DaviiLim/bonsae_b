@@ -1,26 +1,56 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Discipline, DisciplineDocument } from './schema/disciplines.schema';
 import { CreateDisciplineDto } from './dto/create-discipline.dto';
-import { UpdateDisciplineDto } from './dto/update-discipline.dto';
+import { UpdateAcademicClassDto } from 'src/academic_classes/dto/update-academic_class.dto';
 
 @Injectable()
 export class DisciplinesService {
-  create(createDisciplineDto: CreateDisciplineDto) {
-    return 'This action adds a new discipline';
+  constructor(
+    @InjectModel(Discipline.name) private disciplineModel: Model<DisciplineDocument>,
+  ) {}
+
+  async create(createDisciplineDto: UpdateAcademicClassDto): Promise<Discipline> {
+    const createdDiscipline = new this.disciplineModel(createDisciplineDto);
+    return createdDiscipline.save();
   }
 
-  findAll() {
-    return `This action returns all disciplines`;
+  async findAll(): Promise<Discipline[]> {
+    return this.disciplineModel.find({ deleted_at: null }).exec();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} discipline`;
+  async findOne(id: string): Promise<Discipline> {
+    const discipline = await this.disciplineModel.findById(id).exec();
+    if (!discipline) {
+      throw new HttpException('Turma não encontrada!', HttpStatus.NOT_FOUND);
+    }
+    return discipline;
   }
 
-  update(id: number, updateDisciplineDto: UpdateDisciplineDto) {
-    return `This action updates a #${id} discipline`;
+  async update(id: string, updateDisciplineDto: CreateDisciplineDto): Promise<Discipline> {
+    const updatedDiscipline = await this.disciplineModel
+      .findByIdAndUpdate(id, updateDisciplineDto, { new: true })
+      .exec();
+
+    if (!updatedDiscipline) {
+      throw new HttpException('Turma não encontrada!', HttpStatus.NOT_FOUND);
+    }
+
+    return updatedDiscipline;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} discipline`;
+  async remove(id: string): Promise<String> {
+    const discipline = await this.disciplineModel
+    .findById(id)
+    .exec();
+
+    if (!discipline || discipline.deleted_at) {
+      throw new HttpException('Turma não encontrada ou já foi deletada.', HttpStatus.NOT_FOUND);
+    }
+
+    await discipline.updateOne({deleted_at: new Date()})
+
+    return 'Discipline deletada com sucesso!';
   }
 }

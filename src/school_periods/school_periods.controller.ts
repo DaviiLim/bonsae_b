@@ -23,7 +23,7 @@ export class SchoolPeriodsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSchoolPeriodDto: UpdateSchoolPeriodDto) {
+  update(@Param('id') id: string, @Body() updateSchoolPeriodDto: CreateSchoolPeriodDto) {
     return this.schoolPeriodsService.update(id, updateSchoolPeriodDto);
   }
 

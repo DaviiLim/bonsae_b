@@ -19,16 +19,16 @@ export class AcademicClassesController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.academicClassesService.findOne(+id);
+    return this.academicClassesService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateAcademicClassDto: UpdateAcademicClassDto) {
-    return this.academicClassesService.update(+id, updateAcademicClassDto);
+    return this.academicClassesService.update(id, updateAcademicClassDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.academicClassesService.remove(+id);
+    return this.academicClassesService.remove(id);
   }
 }

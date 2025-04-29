@@ -19,16 +19,16 @@ export class DisciplinesController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.disciplinesService.findOne(+id);
+    return this.disciplinesService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDisciplineDto: UpdateDisciplineDto) {
-    return this.disciplinesService.update(+id, updateDisciplineDto);
+  update(@Param('id') id: string, @Body() updateDisciplineDto: CreateDisciplineDto) {
+    return this.disciplinesService.update(id, updateDisciplineDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.disciplinesService.remove(+id);
+    return this.disciplinesService.remove(id);
   }
 }
