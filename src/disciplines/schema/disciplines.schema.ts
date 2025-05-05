@@ -22,14 +22,14 @@ export class Discipline {
     type: String,
     trim: true 
   })
-  matIES?: string;
+  turno?: string;
 
   @Prop({
     type: String,
     trim: true, 
     lowercase: true
   })
-  email?: string;
+  turma: string;
 }
 
 export const DisciplineSchema = SchemaFactory.createForClass(Discipline);

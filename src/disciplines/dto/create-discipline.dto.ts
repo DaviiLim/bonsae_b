@@ -1,35 +1,19 @@
-import { IsString, IsNotEmpty, IsOptional, IsBoolean } from 'class-validator';
+import { IsNumber, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateDisciplineDto {
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
-  school_period_id: string;
+  codigoDisciplina: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  codigoTurma: number;
 
   @IsString()
-  @IsNotEmpty()
-  academic_class_id: string;
-
-  @IsString()
-  @IsNotEmpty()
-  name: string;
-
-  @IsString()
-  @IsNotEmpty()
-  code: string;
-
-  @IsString()
-  @IsNotEmpty()
-  shift: string;
-
   @IsOptional()
-  @IsBoolean()
-  active?: boolean;
+  turno?: string;
 
-  @IsOptional()
-  @IsBoolean()
-  is_exceptional?: boolean;
-
-  @IsOptional()
   @IsString()
-  integration?: string;
+  @IsOptional()
+  turma: string;
 }
