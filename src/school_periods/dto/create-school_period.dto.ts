@@ -1,23 +1,28 @@
-import { IsString, IsNotEmpty, IsDateString, IsOptional, IsISO8601 } from 'class-validator';
+import { IsString, IsNotEmpty, IsEnum, IsDateString, IsNumber } from 'class-validator';
 
 export class CreateSchoolPeriodDto {
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
-  name: string;
+  identificacao: number;
 
   @IsString()
   @IsNotEmpty()
-  school_period: string;
+  @IsEnum([
+    '1º Semestre',
+    '2º Semestre',
+    '1º Semestre - 1º Bimestre',
+    '1º Semestre - 2º Bimestre',
+    '2º Semestre - 1º Bimestre',
+    '2º Semestre - 2º Bimestre',
+  ])
+  periodoLetivo: string;
 
-  @IsISO8601({ strict: true }) 
-  @IsNotEmpty()
-  start_date: string;
+@IsDateString({}, { message: 'start_date deve estar no formato ISO !' })
+@IsNotEmpty()
+start_date: string;
 
-  @IsISO8601({ strict: true })
-  @IsNotEmpty()
-  final_date: string;
+@IsDateString({}, { message: 'final_date deve estar no formato ISO !' })
+@IsNotEmpty()
+final_date: string;
 
-  @IsOptional()
-  @IsDateString()
-  deleted_at?: string;
 }

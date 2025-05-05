@@ -43,14 +43,12 @@ export class UsersService {
   async remove(id: string): Promise<String> {
     
     const user = await this.userModel
-    .findById(id)
+    .findByIdAndDelete(id)
     .exec()
 
-    if (!user || user.deleted_at) {
+    if (!user) {
       throw new HttpException('Usuário não encontrado ou já deletado!', HttpStatus.NOT_FOUND);
     }
-
-   await user.updateOne({deleted_at: new Date()})
 
     return 'Usuário deletado com sucesso!';
   }

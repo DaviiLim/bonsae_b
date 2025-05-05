@@ -1,43 +1,39 @@
-import { IsBoolean, IsDateString, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsString,IsNumber, IsOptional, IsDateString } from 'class-validator';
 
 export class CreateAcademicClassDto {
+  @IsNumber()
+  @IsNotEmpty()
+  schoolPeriodId: number;
 
   @IsString()
-  school_period_id: string;
+  @IsNotEmpty()
+  disciplina: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  codigoDisciplina: number;
+
+  @IsDateString({}, { message: 'start_date deve estar no formato ISO !' })
+  @IsNotEmpty()
+  start_date: string;
+  
+  @IsDateString({}, { message: 'final_date deve estar no formato ISO !' })
+  @IsNotEmpty()
+  final_date: string;  
 
   @IsString()
-  name: string;
-
-  @IsString()
-  code: string;
-
-  @IsDateString()
-  start_date: Date;
-
-  @IsDateString()
-  end_date: Date;
-
-  @IsString()
-  category: string;
-
-  @IsString()
-  course: string;
-
-  @IsBoolean()
-  @IsOptional()
-  active?: boolean;
-
-  @IsBoolean()
-  @IsOptional()
-  is_exceptional?: boolean;
-
-  @IsString()
-  period: string;
-
-  @IsString()
-  campus_id: string;
+  @IsNotEmpty()
+  categoria: string;
 
   @IsString()
   @IsOptional()
-  integration?: string;
+  periodoCurricular?: string;
+
+  @IsString()
+  @IsOptional()
+  estado?: string;
+
+  @IsString()
+  @IsOptional()
+  campus?: string;
 }

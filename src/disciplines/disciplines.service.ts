@@ -42,14 +42,13 @@ export class DisciplinesService {
 
   async remove(id: string): Promise<String> {
     const discipline = await this.disciplineModel
-    .findById(id)
+    .findByIdAndDelete(id)
     .exec();
 
-    if (!discipline || discipline.deleted_at) {
+    if (!discipline) {
       throw new HttpException('Turma não encontrada ou já foi deletada.', HttpStatus.NOT_FOUND);
     }
 
-    await discipline.updateOne({deleted_at: new Date()})
 
     return 'Discipline deletada com sucesso!';
   }

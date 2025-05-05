@@ -5,32 +5,31 @@ export type DisciplineDocument = Discipline & Document;
 
 @Schema({ timestamps: true })
 export class Discipline {
-  @Prop({ required: true })
-  school_period_id: string;
+  @Prop({ 
+    type: Number,
+    required: true
+  })
+  codigoDisciplina: number;
 
-  @Prop({ required: true })
-  academic_class_id: string;
+  @Prop({
+    type: Number,
+    required: true,
+    unique: true
+  })
+  codigoTurma: number;
 
-  @Prop({ required: true })
-  name: string;
+  @Prop({
+    type: String,
+    trim: true 
+  })
+  matIES?: string;
 
-  @Prop({ required: true, unique: true })
-  code: string;
-
-  @Prop({ required: true })
-  shift: string;
-
-  @Prop({ default: true })
-  active: boolean;
-
-  @Prop({ default: false })
-  is_exceptional: boolean;
-
-  @Prop()
-  integration?: string;
-
-  @Prop({ type: Date, default: null })
-  deleted_at?: Date;
+  @Prop({
+    type: String,
+    trim: true, 
+    lowercase: true
+  })
+  email?: string;
 }
 
 export const DisciplineSchema = SchemaFactory.createForClass(Discipline);

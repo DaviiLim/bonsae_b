@@ -1,162 +1,63 @@
-import { IsBoolean, IsDate, IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { PartialType } from '@nestjs/mapped-types';
+import { 
+  IsEmail, 
+  IsNotEmpty, 
+  IsOptional, 
+  IsString, 
+  Matches 
+} from 'class-validator';
 
-// Para uma melhor explicação, eu vou colocar o ApiProperty ! 
 export class CreateUserDto {
-  @IsString()
   @IsNotEmpty()
-  id_old_bonsae: string;
-
   @IsString()
-  @IsNotEmpty()
-  id_audora: string;
+  perfil: string;
 
-  @IsString()
-  @IsNotEmpty()
-  profile_id: string;
-
-  @IsBoolean()
   @IsOptional()
-  active?: boolean;
-
   @IsString()
-  @IsNotEmpty()
-  name: string;
+  subperfil?: string;
 
+  @IsNotEmpty()
   @IsString()
-  @IsNotEmpty()
-  registration_number: string;
+  nome: string;
 
+  @IsOptional()
+  @IsString()
+  numeroOab?: string;
+
+  @IsOptional()
+  @IsString()
+  seccionalOab?: string;
+
+  @IsNotEmpty()
   @IsEmail()
-  @IsNotEmpty()
   email: string;
 
-  @IsBoolean()
   @IsOptional()
-  receive_emails?: boolean;
-
   @IsString()
+  matriculaIES?: string;
+
+  @IsOptional()
+  @IsString()
+  @Matches(/^(\(?\d{2}\)?\s?)?(\d{4,5}-?\d{4})$/, {
+    message: 'Telefone inválido',
+  })
+  telefone?: string;
+
+  @IsOptional()
+  @IsString()
+  @Matches(/^\d{11}$|^\d{3}\.\d{3}\.\d{3}-\d{2}$/, {
+    message: 'CPF inválido',
+  })
+  cpf?: string;
+
   @IsNotEmpty()
-  gmail: string;
-
   @IsString()
-  @IsOptional()
-  gcalendar_credentials?: string;
+  senha: string;
 
-  @IsBoolean()
   @IsOptional()
-  approve_api?: boolean;
-
   @IsString()
-  @IsOptional()
-  approve_msg?: string;
+  periodoCurricular?: string;
 
+  @IsOptional()
   @IsString()
-  @IsOptional()
-  telephone?: string;
-
-  @IsString()
-  @IsNotEmpty()
-  password: string; //melhorar
-
-  @IsString()
-  @IsNotEmpty()
-  cpf: string;
-
-  @IsString()
-  @IsNotEmpty()
-  period_id: string;
-
-  @IsString()
-  @IsOptional()
-  oab?: string;
-
-  @IsString()
-  @IsOptional()
-  oab_uf?: string;
-
-  @IsString()
-  @IsOptional()
-  workload_real?: string;
-
-  @IsString()
-  @IsOptional()
-  workload_simulated?: string;
-
-  @IsString()
-  @IsOptional()
-  observations?: string;
-
-  @IsString()
-  @IsOptional()
-  profile_pic?: string;
-
-  @IsString()
-  @IsOptional()
-  course?: string;
-
-  @IsString()
-  @IsOptional()
-  course_id?: string;
-
-  @IsBoolean()
-  @IsOptional()
-  is_admin?: boolean;
-
-  @IsString()
-  @IsOptional()
-  remember_token?: string;
-
-  @IsString()
-  @IsOptional()
-  access_token?: string;
-
-  @IsString()
-  @IsOptional()
-  browser_agent?: string;
-
-  @IsDate()
-  @IsOptional()
-  date_accept?: Date;
-
-  @IsDate()
-  @IsOptional()
-  last_login?: Date;
-
-  @IsDate()
-  @IsOptional()
-  last_logout?: Date;
-
-  @IsString()
-  @IsOptional()
-  logged_time?: string;
-
-  @IsString()
-  @IsOptional()
-  all_time_logged?: string;
-
-  @IsString()
-  @IsOptional()
-  average_logged_time?: string;
-
-  @IsOptional()
-  times_active?: number;
-
-  @IsString()
-  @IsNotEmpty()
-  ip: string;
-
-  @IsBoolean()
-  @IsOptional()
-  permission?: boolean;
-
-  @IsString()
-  @IsOptional()
-  integration?: string;
-
-  @IsOptional()
-  deleted_at?: Date;
+  observacoes?: string;
 }
-
-// DTO para atualização de usuário (todos os campos opcionais)
-export class UpdateUserDto extends PartialType(CreateUserDto) {}

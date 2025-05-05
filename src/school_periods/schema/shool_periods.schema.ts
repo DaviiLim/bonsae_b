@@ -3,22 +3,44 @@ import { Document } from 'mongoose';
 
 export type SchoolPeriodDocument = SchoolPeriod & Document;
 
-@Schema({ timestamps: true }) // createdA - updatedAt 
+@Schema({ 
+  timestamps: true,
+  collection: 'school_periods'
+})
 export class SchoolPeriod {
-  @Prop({ required: true })
-  name: string;
+  @Prop({
+    type: Number, 
+    required: true,
+    unique: true
+  })
+  identificacao: number;
 
-  @Prop({ required: true })
-  school_period: string;
+  @Prop({ 
+    type: String,
+    required: true,
+    trim: true,  
+    enum: [
+      '1º Semestre',
+      '2º Semestre', 
+      '1º Semestre - 1º Bimestre',
+      '1º Semestre - 2º Bimestre',
+      '2º Semestre - 1º Bimestre',
+      '2º Semestre - 2º Bimestre'
+    ]
+  })
+  periodoLetivo: string;
 
-  @Prop({ type: Date, required: true })
+  @Prop({ 
+    type: Date,  
+    required: true
+  })
   start_date: Date;
 
-  @Prop({ type: Date, required: true })
+  @Prop({ 
+    type: Date,  
+    required: true
+  })
   final_date: Date;
-
-  @Prop({ type: Date, default: null }) // deleted_at
-  deleted_at?: Date;
 }
 
 export const SchoolPeriodSchema = SchemaFactory.createForClass(SchoolPeriod);

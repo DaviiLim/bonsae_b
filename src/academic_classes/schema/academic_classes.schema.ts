@@ -3,47 +3,63 @@ import { Document } from 'mongoose';
 
 export type AcademicClassDocument = AcademicClasses & Document;
 
-@Schema({ timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
+@Schema({ timestamps: true })
 export class AcademicClasses {
+  @Prop({ 
+    type: Number,
+    required: true
+  })
+  periodoLetivoIdentificacao: number;
 
-  @Prop()
-  school_period_id: string;
+  @Prop({
+    type: String,
+    required: true,
+    trim: true 
+  })
+  disciplina: string;
 
-  @Prop()
-  name: string;
+  @Prop({ 
+    type: Number,
+    required: true
+  })
+  codigoDisciplina: number;
 
-  @Prop()
-  code: string;
+  @Prop({ 
+    type: Date,
+    required: true
+  })
+  dataInicial: Date;
 
-  @Prop()
-  start_date: Date;
+  @Prop({ 
+    type: Date,
+    required: true
+  })
+  dataFinal: Date;
 
-  @Prop()
-  end_date: Date;
+  @Prop({
+    type: String,
+    required: true,
+    trim: true 
+  })
+  categoria: string;
 
-  @Prop()
-  category: string;
+  @Prop({
+    type: String,
+    trim: true
+  })
+  periodoCurricular?: string;
 
-  @Prop()
-  course: string;
+  @Prop({
+    type: String,
+    trim: true 
+  })
+  estado?: string;
 
-  @Prop({ default: true })
-  active?: boolean;
-
-  @Prop({ default: false })
-  is_exceptional?: boolean;
-
-  @Prop()
-  period: string;
-
-  @Prop()
-  campus_id: string;
-
-  @Prop()
-  integration?: string;
-
-  @Prop({ type: Date, default: null })
-  deleted_at?: Date;
+  @Prop({
+    type: String,
+    trim: true
+  })
+  campus?: string;
 }
 
 export const AcademicClassSchema = SchemaFactory.createForClass(AcademicClasses);

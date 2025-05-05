@@ -3,130 +3,85 @@ import { Document } from 'mongoose';
 
 export type UserDocument = User & Document;
 
-@Schema({ timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
+@Schema({ timestamps: true })
 export class User {
-  @Prop()
-  id_old_bonsae: string;
+  @Prop({
+    type: String,
+    required: true,
+    trim: true,
+  })
+  perfil: string;
 
-  @Prop()
-  id_audora: string;
+  @Prop({
+    type: String,
+    trim: true,
+  })
+  subperfil?: string;
 
-  @Prop()
-  profile_id: string;
+  @Prop({
+    type: String,
+    required: true,
+    trim: true,
+  })
+  nome: string;
 
-  @Prop({ default: true })
-  active?: boolean;
+  @Prop({
+    type: String,
+    trim: true,
+  })
+  numeroOab?: string;
 
-  /**
-   * Coordenador(a)
-   * Professor(a)
-   * Aluno(a)
-   * etc
-   */
-  @Prop()
-  name: string; 
+  @Prop({
+    type: String,
+    trim: true,
+  })
+  seccionalOab?: string;
 
-  @Prop()
-  registration_number: string;
-
-  @Prop()
+  @Prop({
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+    lowercase: true,
+  })
   email: string;
 
-  @Prop({ default: false })
-  receive_emails?: boolean;
+  @Prop({
+    type: String,
+    trim: true,
+  })
+  matriculaIES?: string;
 
-  @Prop()
-  gmail: string;
+  @Prop({
+    type: String,
+    trim: true,
+  })
+  telefone?: string;
 
-  @Prop()
-  gcalendar_credentials?: string;
+  @Prop({
+    type: String,
+    trim: true,
+  })
+  cpf?: string;
 
-  @Prop({ default: false })
-  approve_api?: boolean;
+  @Prop({
+    type: String,
+    required: true,
+    trim: true
+  })
+  senha: string;
 
-  @Prop()
-  approve_msg?: string;
+  @Prop({
+    type: String,
+    trim: true,
+  })
+  periodoCurricular?: string;
 
-  @Prop()
-  telephone?: string;
-
-  @Prop({select: false})
-  password: string;
-
-  @Prop({unique: true})
-  cpf: string;
-
-  @Prop()
-  period_id: string;
-
-  @Prop()
-  oab?: string;
-
-  @Prop()
-  oab_uf?: string;
-
-  @Prop()
-  workload_real?: string;
-
-  @Prop()
-  workload_simulated?: string;
-
-  @Prop()
-  observations?: string;
-
-  @Prop()
-  profile_pic?: string;
-
-  @Prop()
-  course?: string;
-
-  @Prop()
-  course_id?: string;
-
-  @Prop({ default: false })
-  is_admin?: boolean;
-
-  @Prop()
-  remember_token?: string;
-  //Como vai funcionar esses dois? Armazenar? 
-  @Prop()
-  access_token?: string;
-
-  @Prop()
-  browser_agent?: string;
-
-  @Prop()
-  date_accept?: Date;
-
-  @Prop()
-  last_login?: Date;
-
-  @Prop()
-  last_logout?: Date;
-
-  @Prop()
-  logged_time?: string;
-
-  @Prop()
-  all_time_logged?: string;
-
-  @Prop()
-  average_logged_time?: string;
-
-  @Prop()
-  times_active?: number;
-
-  @Prop()
-  ip: string;
-
-  @Prop({ default: false })
-  permission?: boolean;
-
-  @Prop()
-  integration?: string;
-
-  @Prop({ type: Date, default: null })
-  deleted_at?: Date;
+  @Prop({
+    type: String,
+    trim: true,
+  })
+  observacoes?: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

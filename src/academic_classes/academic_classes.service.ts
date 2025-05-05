@@ -41,14 +41,14 @@ export class AcademicClassesService {
   }
 
   async remove(id: string): Promise<string> {
-    const academicClass = await this.academicClassModel.findById(id).exec();
+    const academicClass = await this.academicClassModel
+    .findByIdAndDelete(id)
+    .exec();
 
-    if (!academicClass || academicClass.deleted_at) {
+    if (!academicClass) {
       throw new HttpException('Turma não encontrada ou já foi deletada.', HttpStatus.NOT_FOUND);
     }
-
-    await academicClass.updateOne({ deleted_at: new Date() });
-
+    
     return 'Turma deletada com sucesso!';
   }
 }

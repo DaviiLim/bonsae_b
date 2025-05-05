@@ -46,14 +46,12 @@ export class SchoolPeriodsService {
 
   async remove(id: string): Promise<String> {
     const updatedDeletedPeriod = await this.schoolPeriodModel
-      .findById(id)
+      .findByIdAndDelete(id)
       .exec();
   
-    if (!updatedDeletedPeriod || updatedDeletedPeriod.deleted_at) {
+    if (!updatedDeletedPeriod) {
       throw new HttpException('O Período letivo não foi encontrado ou foi deletado!', HttpStatus.NOT_FOUND);
     }
-    
-    await updatedDeletedPeriod.updateOne({deleted_at: new Date()})
 
     return 'School Period deletado com sucesso!';  
   }
