@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { PeriodoLetivoService } from './periodos-letivos.service';
+import { PeriodosLetivosService } from './periodos-letivos.service';
 import { CreatePeriodosLetivoDto } from './dto/create-periodos-letivo.dto';
 import { UpdatePeriodosLetivoDto } from './dto/update-periodos-letivo.dto';
 
 @Controller('periodos-letivos')
 export class PeriodosLetivosController {
-  constructor(private readonly periodosLetivosService: PeriodoLetivoService) {}
+  constructor(private readonly periodosLetivosService: PeriodosLetivosService) {}
 
   @Post()
   create(@Body() createPeriodosLetivoDto: CreatePeriodosLetivoDto) {
