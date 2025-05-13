@@ -6,11 +6,20 @@ export type PeriodosLetivosDocument = PeriodosLetivos & Document;
 @Schema({ timestamps: true, collection: 'academic_classes' })
 export class PeriodosLetivos {
   
-  @Prop({
-    type: Types.ObjectId,
-    trim: true
+  @Prop({ 
+    required: true,
+    
   })
-  identificacao: Types.ObjectId;
+  identificacao: string; 
+
+  @Prop({ required: true })
+  periodoLetivo: string;
+
+  @Prop({ required: true })
+  dataInicio: Date;
+
+  @Prop({ required: true })
+  dataFim: Date;
 
 }
 
