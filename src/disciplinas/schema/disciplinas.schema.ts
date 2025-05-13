@@ -1,19 +1,17 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { DisciplinasCategoriaEnum } from '../enum/disciplinasCategoria.enum';
 import { DisciplinasEstadoEnum } from '../enum/disciplinasEstado.enum';
-import { Types } from 'mongoose';
+import mongoose, { Types } from 'mongoose';
+import { PeriodosLetivos } from 'src/periodos-letivos/schema/periodos-letivos.schema';
 
 export type DisciplinaDocument = Disciplina & Document;
 
 @Schema({ timestamps: true, collection: 'disciplinas' })
 export class Disciplina {
 
-  @Prop({ 
-    type: Types.ObjectId, 
-    ref: 'PeriodosLetivos',
-    required: true 
-  })
-  identificacaoPeriodoLetivo: Types.ObjectId;
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PeriodosLetivos' }] })
+  periodosLetivos: PeriodosLetivos[];
+
 
   @Prop({ required: true })
   nome: string;
