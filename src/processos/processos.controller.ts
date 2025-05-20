@@ -1,5 +1,4 @@
-// src/processos/processos.controller.ts
-import { Controller, Get, Post, Body, Param, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, BadRequestException } from '@nestjs/common';
 import { ProcessosService } from './processos.service';
 
 @Controller('processos')
@@ -8,25 +7,19 @@ export class ProcessosController {
 
   @Post()
   async criarProcesso(@Body('processoID') processoID: string) {
-    return this.processosService.criarProcesso(processoID);
-  }
+    if (!processoID) {
+      throw new BadRequestException('O campo processoID é obrigatório.');
+    }
 
-  @Get()
-  async listarTodosProcessos() {
-    return this.processosService.listarProcessos();
-  }
-
-  @Get(':id')
-  async buscarProcessoPorId(@Param('id') id: string) {
     try {
-      return await this.processosService.procurarProcessos(id);
+      return await this.processosService.criarProcesso(processoID);
     } catch (error) {
-      throw new NotFoundException(error.message);
+      throw new BadRequestException(error.message);
     }
   }
 
-  @Post(':id/concluir')
-  async finalizarProcesso(@Param('id') id: string) {
-    return this.processosService.concluirProcesso(id);
+  @Get()
+  async listarTodos() {
+    return await this.processosService.listarProcessos();
   }
 }
