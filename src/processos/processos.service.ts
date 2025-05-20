@@ -11,11 +11,7 @@ export class ProcessosService {
   ) {}
 
   async criarProcesso(processoID: string): Promise<Processo> {
-    const novoProcesso = new this.processoModel({
-      processoID,
-      status: ProcessosStatusEnum.EM_ANDAMENTO,
-      dataInicio: new Date(),
-    });
+    const novoProcesso = new this.processoModel();
     return novoProcesso.save();
   }
 

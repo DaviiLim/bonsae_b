@@ -1,13 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { UsuariosPerfilEnum } from '../enum/usuariosPerfil.enum';
 
 export type UsuarioDocument = Usuario & Document;
 
 @Schema({ timestamps: true, collection: 'usuarios' })
 export class Usuario {
 
-  @Prop({ required: true })
-  perfil: string;
+  @Prop({ required: true, enum: UsuariosPerfilEnum })
+  perfil: UsuariosPerfilEnum;
 
   @Prop()
   subperfil?: string;
@@ -30,7 +31,7 @@ export class Usuario {
   @Prop()
   telefone?: string;
 
-  @Prop()
+  @Prop({ unique: true })
   cpf?: string;
 
   @Prop({ required: true })
