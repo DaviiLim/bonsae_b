@@ -1,7 +1,7 @@
 export enum DisciplinasCategoriaEnum{
 
-  CURSO = 'curso',
-  NPJ = 'npj',
-  PROJETOS_EXTENSIONISTAS = 'projetos-extensionistas'
+  CURSO = 'CURSO',
+  NPJ = 'NPJ',
+  PROJETOS_EXTENSIONISTAS = 'PROJETOS-EXTENSIONISTAS'
 
 }

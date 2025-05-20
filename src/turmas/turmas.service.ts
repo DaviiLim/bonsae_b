@@ -1,26 +1,53 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Turma, TurmaDocument } from './schema/turmas.schema';
 import { CreateTurmaDto } from './dto/create-turma.dto';
 import { UpdateTurmaDto } from './dto/update-turma.dto';
 
 @Injectable()
 export class TurmasService {
-  create(createTurmaDto: CreateTurmaDto) {
-    return 'This action adds a new turma';
+  constructor(
+    @InjectModel(Turma.name)
+    private readonly turmaModel: Model<TurmaDocument>,
+  ) {}
+
+  async create(dto: CreateTurmaDto): Promise<Turma> {
+    const jaExiste = await this.turmaModel.findOne({ codigoTurma: dto.codigoTurma });
+    if (jaExiste) {
+      throw new ConflictException('ERROR - Já existe uma turma com esse código');
+    }
+
+    const novaTurma = new this.turmaModel(dto);
+    return novaTurma.save();
   }
 
-  findAll() {
-    return `This action returns all turmas`;
+  async findAll(): Promise<Turma[]> {
+    return this.turmaModel.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} turma`;
+  async findById(id: string): Promise<Turma> {
+    const turma = await this.turmaModel.findById(id);
+    if (!turma) {
+      throw new NotFoundException('ERROR - Turma não encontrada!');
+    }
+    return turma;
   }
 
-  update(id: number, updateTurmaDto: UpdateTurmaDto) {
-    return `This action updates a #${id} turma`;
+  async update(id: string, dto: UpdateTurmaDto): Promise<Turma> {
+    const atualizada = await this.turmaModel.findByIdAndUpdate(id, dto, { new: true });
+    if (!atualizada) {
+      throw new NotFoundException('ERROR - Turma não foi atualizada/encontrada!');
+    }
+    return atualizada;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} turma`;
+  async delete(id: string): Promise<{ message: string }> {
+    const resultado = await this.turmaModel.findByIdAndDelete(id);
+    if (!resultado) {
+      throw new NotFoundException('ERROR - Turma não encontrada!');
+    }
+
+    return { message: 'Turma excluída com sucesso.' };
   }
 }

@@ -1,4 +1,3 @@
-// src/processos/dto/create-processo.dto.ts
 import { IsEnum, IsNotEmpty, IsOptional, IsString, IsDateString } from 'class-validator';
 import { ProcessosStatusEnum } from '../enum/processosStatus.enum';
 

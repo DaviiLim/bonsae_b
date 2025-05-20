@@ -22,12 +22,6 @@ export class PeriodosLetivosController {
     return this.periodosLetivosService.findById(id);
   }
 
-  @Get('processos/:processoId')
-  findByProcessoId(@Param('processoId') processoId: string) {
-    return this.periodosLetivosService.findByProcessoId(processoId);
-}
-
-
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePeriodosLetivoDto: UpdatePeriodosLetivoDto) {
     return this.periodosLetivosService.update(id, updatePeriodosLetivoDto);

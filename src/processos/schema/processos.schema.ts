@@ -1,11 +1,10 @@
-// src/processos/entities/processo.entity.ts
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { ProcessosStatusEnum } from '../enum/processosStatus.enum';
 
 export type ProcessoDocument = Processo & Document;
 
-@Schema({ timestamps: true })
+@Schema({ timestamps: true, collection: 'processos' })
 export class Processo {
   @Prop({ required: true, unique: true })
   processoID: string; 
