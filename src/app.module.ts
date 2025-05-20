@@ -5,7 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { PeriodosLetivosModule } from './periodos-letivos/periodos-letivos.module';
 import { DisciplinasModule } from './disciplinas/disciplinas.module';
 import { ProcessosModule } from './processos/processos.module';
-import { TurmasModule } from './turmas/turmas.module';
+import { TurmaModule } from './turmas/turmas.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { VinculosModule } from './vinculos/vinculos.module';
 
@@ -15,7 +15,7 @@ import { VinculosModule } from './vinculos/vinculos.module';
     PeriodosLetivosModule,
     DisciplinasModule,
     ProcessosModule,
-    TurmasModule,
+    TurmaModule,
     UsuariosModule,
     VinculosModule,
   ],

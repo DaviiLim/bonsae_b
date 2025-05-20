@@ -1,17 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TurmasController } from './turmas.controller';
-import { TurmasService } from './turmas.service';
+import { TurmaController } from './turmas.controller';
+import { TurmaService } from './turmas.service';
 
 describe('TurmasController', () => {
-  let controller: TurmasController;
+  let controller: TurmaController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [TurmasController],
-      providers: [TurmasService],
+      controllers: [TurmaController],
+      providers: [TurmaService],
     }).compile();
 
-    controller = module.get<TurmasController>(TurmasController);
+    controller = module.get<TurmaController>(TurmaService);
   });
 
   it('should be defined', () => {
