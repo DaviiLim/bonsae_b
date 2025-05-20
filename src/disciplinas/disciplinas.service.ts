@@ -36,7 +36,7 @@ export class DisciplinasService {
 
       const novaDisciplina = new this.disciplinaModel({
         ...createDisciplinaDto,
-        periodosLetivos: [periodoId], 
+        periodosLetivos: [periodoId],
       });
 
       const disciplinaSalva = await novaDisciplina.save();

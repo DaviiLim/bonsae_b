@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { IsMongoId } from 'class-validator';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export type PeriodosLetivosDocument = PeriodosLetivos & Document;
 
@@ -9,6 +9,9 @@ export class PeriodosLetivos {
   
   @Prop({ required: true, unique: true })
   identificacao: string;
+
+  @Prop({ type: Types.ObjectId, ref: 'Processo', required: true })
+  processoId: Types.ObjectId;
 
   @Prop({ required: true })
   periodoLetivo: string;

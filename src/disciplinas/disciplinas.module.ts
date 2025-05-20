@@ -9,7 +9,7 @@ import { PeriodosLetivos, PeriodosLetivosSchema } from '../periodos-letivos/sche
   imports: [
     MongooseModule.forFeature([
       { name: Disciplina.name, schema: DisciplinaSchema },
-      { name: PeriodosLetivos.name, schema: PeriodosLetivosSchema } // Adicione esta linha
+      { name: PeriodosLetivos.name, schema: PeriodosLetivosSchema } 
     ]),
   ],
   controllers: [DisciplinasController],

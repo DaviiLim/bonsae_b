@@ -1,4 +1,4 @@
-import { IsDateString, IsEnum, IsNotEmpty, IsString } from "class-validator";
+import { IsDateString, IsEnum, IsMongoId, IsNotEmpty, IsString } from "class-validator";
 import { PeriodoLetivoEnum } from "../enum/periodo-letivo.enum";
 
 export class CreatePeriodosLetivoDto {
@@ -6,6 +6,10 @@ export class CreatePeriodosLetivoDto {
   @IsNotEmpty()
   @IsString()
   identificacao: string;
+
+  @IsNotEmpty()
+  @IsMongoId()
+  processoId: string;
 
   @IsNotEmpty()
   @IsEnum(PeriodoLetivoEnum)

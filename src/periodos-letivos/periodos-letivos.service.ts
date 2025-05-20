@@ -33,6 +33,11 @@ export class PeriodosLetivosService {
     return periodo;
   }
 
+  async findByProcessoId(processoId: string): Promise<PeriodosLetivos[]> {
+  return this.periodoLetivoModel.find({ processoId });
+}
+
+
   async update(id: string, dto: UpdatePeriodosLetivoDto): Promise<PeriodosLetivos> {
     const atualizado = await this.periodoLetivoModel.findByIdAndUpdate(id, dto, { new: true });
     if (!atualizado) throw new NotFoundException('ERROR - Período letivo não foi atualizado/encontrado !');
