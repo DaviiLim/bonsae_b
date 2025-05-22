@@ -7,64 +7,54 @@ import { PeriodosLetivos, PeriodosLetivosDocument } from '../periodos-letivos/sc
 @Injectable()
 export class ProcessosService {
   constructor(
-    @InjectModel(Processo.name) private processoModel: Model<ProcessoDocument>,
-    @InjectModel(PeriodosLetivos.name) private periodosLetivosModel: Model<PeriodosLetivosDocument>,
+    @InjectModel(Processo.name) private readonly processoModel: Model<ProcessoDocument>,
+    @InjectModel(PeriodosLetivos.name) private readonly periodoLetivoModel: Model<PeriodosLetivosDocument>,
   ) {}
 
-  async criarProcesso(id): Promise<Processo> {
-    const novoProcesso = new this.processoModel({ id });
-    return novoProcesso.save();
+  async criarProcesso(processoID: string): Promise<Processo> {
+    const novo = new this.processoModel({ processoID });
+    return novo.save();
   }
 
   async listarProcessos(): Promise<Processo[]> {
-    return this.processoModel.find().exec();
+    return this.processoModel.find();
   }
 
-  async procurarProcessos(id): Promise<Processo[]> {
-    const processos = await this.processoModel.find({ id }).exec();
-
-    if (processos.length === 0) {
-      throw new NotFoundException('Nenhum processo encontrado com este ID!');
+  async buscarPorId(_id: string): Promise<Processo> {
+    if (!Types.ObjectId.isValid(_id)) {
+      throw new NotFoundException('ID inválido');
     }
 
-    return processos;
-  }
-
-  async concluirProcesso(id): Promise<Processo> {
-    const processoAtualizado = await this.processoModel
-      .findByIdAndUpdate(
-        id,
-        { status: 'CONCLUIDO', dataFim: new Date() },
-        { new: true },
-      )
-      .exec();
-
-    if (!processoAtualizado) {
-      throw new NotFoundException(`Processo com ID ${id} não encontrado`);
-    }
-
-    return processoAtualizado;
-  }
-
-  async buscarProcessoPorId(id): Promise<Processo> {
-    const processo = await this.processoModel.findById(id).exec();
-
-    if (!processo) {
-      throw new NotFoundException(`Processo com ID ${id} não encontrado`);
-    }
+    const processo = await this.processoModel.findById(_id);
+    if (!processo) throw new NotFoundException('Processo não encontrado');
 
     return processo;
   }
 
-  async buscaratreladosPorProcesso(id) {
-    if (!Types.ObjectId.isValid(id)) {
-      throw new NotFoundException('ID de processo inválido');
+  async concluirProcesso(_id: string): Promise<Processo> {
+    const existeProcesso = await this.processoModel.findById(_id);
+    if (!existeProcesso) {
+      throw new NotFoundException('Processo não encontrado');
+    }
+    const atualizado = await this.processoModel.findByIdAndUpdate(
+      _id,
+      { status: 'CONCLUIDO', dataFim: new Date() },
+      { new: true },
+    );
+    if (!atualizado) {
+      throw new NotFoundException('Falha ao atualizar o processo');
     }
 
-    const periodos = await this.periodosLetivosModel.find({ id }).exec();
+    return atualizado;
+  }
 
-    if (!periodos || periodos.length === 0) {
-      throw new NotFoundException('Nenhum período letivo encontrado para este processo');
+  async buscarPeriodosPorProcesso(processoID: string) {
+    await this.buscarPorId(processoID);
+
+    const periodos = await this.periodoLetivoModel.find({ processoId: processoID });
+
+    if (!periodos.length) {
+      throw new NotFoundException('Nenhum período letivo vinculado a este processo');
     }
 
     return periodos;

@@ -4,7 +4,7 @@ import { ProcessosStatusEnum } from '../enum/processosStatus.enum';
 
 export type ProcessoDocument = Processo & Document;
 
-@Schema({ timestamps: true, collection: 'processos' })
+@Schema({collection: 'processos' })
 export class Processo {
   @Prop({ required: true, unique: true })
   processoID: string; 
