@@ -2,16 +2,18 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { DisciplinasCategoriaEnum } from '../enum/disciplinasCategoria.enum';
 import { DisciplinasEstadoEnum } from '../enum/disciplinasEstado.enum';
 import mongoose, { Types } from 'mongoose';
-import { PeriodosLetivos } from 'src/periodos-letivos/schema/periodos-letivos.schema';
 
 export type DisciplinaDocument = Disciplina & Document;
 
-@Schema({ timestamps: true, collection: 'disciplinas' })
+@Schema({ collection: 'disciplinas' })
 export class Disciplina {
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PeriodosLetivos' }] })
-  periodosLetivos: PeriodosLetivos[];
+  periodosLetivosID: Types.ObjectId[];
 
+
+  @Prop({ type: Types.ObjectId, ref: 'Processo', required: true })
+  processoID: Types.ObjectId;
 
   @Prop({ required: true })
   nome: string;
@@ -43,10 +45,10 @@ dataFim: Date;
   @Prop()
   periodoCurricular?: string;
 
-  @Prop( { 
+  @Prop({ 
     enum: DisciplinasEstadoEnum,
-    default: DisciplinasEstadoEnum.INATIVA
-   } )
+    default: DisciplinasEstadoEnum.ATIVA
+   })
   estado?: string;
 
   @Prop()

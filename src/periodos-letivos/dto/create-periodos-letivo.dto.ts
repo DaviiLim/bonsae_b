@@ -9,7 +9,7 @@ export class CreatePeriodosLetivoDto {
 
   @IsNotEmpty()
   @IsMongoId()
-  processoId: string;
+  processoID: string;
 
   @IsNotEmpty()
   @IsEnum(PeriodoLetivoEnum)

@@ -8,11 +8,11 @@ export class CreateProcessoDto {
   
   @IsDateString()
   @IsOptional()
-  dataInicio?: Date;
+  dataInicio?: string;
 
   @IsDateString()
   @IsOptional()
-  dataFim?: Date;
+  dataFim?: string;
 
   @IsEnum(ProcessosStatusEnum)
   @IsOptional()

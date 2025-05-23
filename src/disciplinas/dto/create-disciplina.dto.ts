@@ -1,12 +1,17 @@
-import { IsDateString, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsDateString, IsEnum, IsMongoId, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { DisciplinasCategoriaEnum } from '../enum/disciplinasCategoria.enum';
 import { DisciplinasEstadoEnum } from '../enum/disciplinasEstado.enum';
 
 export class CreateDisciplinaDto {
   
   @IsNotEmpty()
-  @IsString()
-  identificacaoPeriodoLetivo: string;
+  @IsArray()
+  @IsMongoId({ each: true })
+  periodosLetivosID: string;
+
+  @IsNotEmpty()
+  @IsMongoId()
+  processoID: string;
 
   @IsNotEmpty()
   @IsString()

@@ -3,7 +3,7 @@ import { TurmasTurnoEnum } from "../enum/turmasTurno.enum";
 
 export type TurmaDocument = Turma & Document;
 
-@Schema({ timestamps: true, collection: 'turmas' })
+@Schema({ collection: 'turmas' })
 export class Turma {
   
   @Prop( {required: true} )

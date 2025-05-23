@@ -33,8 +33,4 @@ export class ProcessosController {
     return this.processosService.concluirProcesso(id);
   }
 
-  @Get(':id/periodos-letivos')
-  async getPeriodosPorProcesso(@Param('id') id: string) {
-    return this.processosService.buscarPeriodosPorProcesso(id);
-  }
 }

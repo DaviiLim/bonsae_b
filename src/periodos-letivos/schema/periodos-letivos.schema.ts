@@ -11,7 +11,7 @@ export class PeriodosLetivos {
   identificacao: string;
 
   @Prop({ type: Types.ObjectId, ref: 'Processo', required: true })
-  processoId: Types.ObjectId;
+  processoID: Types.ObjectId;
 
   @Prop({ required: true })
   periodoLetivo: string;

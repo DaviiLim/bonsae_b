@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Processo, ProcessoDocument } from './schema/processos.schema';
@@ -12,9 +12,21 @@ export class ProcessosService {
   ) {}
 
   async criarProcesso(processoID: string): Promise<Processo> {
-    const novo = new this.processoModel({ processoID });
-    return novo.save();
+
+  const jaExiste = await this.processoModel.findOne({ processoID });
+  if (jaExiste) {
+    throw new ConflictException('Já existe um processo com esse processoID.');
   }
+
+  const novo = new this.processoModel({ processoID });
+
+  try {
+    return await novo.save();
+  } catch (err) {
+    throw new NotFoundException('Falha ao salvar o processo.');
+  }
+}
+
 
   async listarProcessos(): Promise<Processo[]> {
     return this.processoModel.find();
@@ -48,15 +60,5 @@ export class ProcessosService {
     return atualizado;
   }
 
-  async buscarPeriodosPorProcesso(processoID: string) {
-    await this.buscarPorId(processoID);
-
-    const periodos = await this.periodoLetivoModel.find({ processoId: processoID });
-
-    if (!periodos.length) {
-      throw new NotFoundException('Nenhum período letivo vinculado a este processo');
-    }
-
-    return periodos;
-  }
+  
 }

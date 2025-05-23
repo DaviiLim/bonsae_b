@@ -1,4 +1,4 @@
-import { ConflictException,Injectable,NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Usuario, UsuarioDocument } from './schema/usuarios.schema';
@@ -8,14 +8,16 @@ import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 @Injectable()
 export class UsuariosService {
   constructor(
+
     @InjectModel(Usuario.name)
     private readonly usuarioModel: Model<UsuarioDocument>,
+
   ) {}
 
   async create(dto: CreateUsuarioDto): Promise<Usuario> {
-    const jaExiste = await this.usuarioModel.findOne({ email: dto.email });
-    if (jaExiste) {
-      throw new ConflictException('ERROR - Já existe um usuário com esse e-mail');
+    const usuarioExistente = await this.usuarioModel.findOne({ email: dto.email });
+    if (usuarioExistente) {
+      throw new ConflictException('Já existe um usuário com este e-mail.');
     }
 
     const novoUsuario = new this.usuarioModel(dto);
@@ -23,13 +25,17 @@ export class UsuariosService {
   }
 
   async findAll(): Promise<Usuario[]> {
-    return this.usuarioModel.find();
+    const usuarios = await this.usuarioModel.find();
+    if (!usuarios.length) {
+      throw new NotFoundException('Nenhum usuário encontrado.');
+    }
+    return usuarios;
   }
 
   async findById(id: string): Promise<Usuario> {
     const usuario = await this.usuarioModel.findById(id);
     if (!usuario) {
-      throw new NotFoundException('ERROR - Usuário não encontrado!');
+      throw new NotFoundException('Usuário não encontrado.');
     }
     return usuario;
   }
@@ -39,17 +45,31 @@ export class UsuariosService {
       new: true,
     });
     if (!atualizado) {
-      throw new NotFoundException('ERROR - Usuário não foi atualizado/encontrado!');
+      throw new NotFoundException('Não foi possível atualizar: usuário não encontrado.');
     }
     return atualizado;
   }
 
   async delete(id: string): Promise<{ message: string }> {
-    const resultado = await this.usuarioModel.findByIdAndDelete(id);
-    if (!resultado) {
-      throw new NotFoundException('ERROR - Usuário não encontrado!');
+    const deletado = await this.usuarioModel.findByIdAndDelete(id);
+    if (!deletado) {
+      throw new NotFoundException('Usuário não encontrado para exclusão.');
     }
 
     return { message: 'Usuário excluído com sucesso.' };
   }
+
+  async buscarProcesso(id: string): Promise<Usuario> {
+  const usuario = await this.usuarioModel
+    .findById(id)
+    .populate('processoID')
+    .lean();
+
+  if (!usuario) {
+    throw new NotFoundException('Processo vinculado não encontrado.');
+  }
+
+  return usuario;
+}
+
 }

@@ -31,4 +31,9 @@ export class PeriodosLetivosController {
   remove(@Param('id') id: string) {
     return this.periodosLetivosService.delete(id);
   }
+
+  @Get(':id/processos')
+  buscarProcesso(@Param('id') id: string){
+    return this.periodosLetivosService.buscarProcesso(id)
+  }
 }

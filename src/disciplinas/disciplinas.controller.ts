@@ -31,4 +31,13 @@ export class DisciplinasController {
   remove(@Param('id') id: string) {
     return this.disciplinasService.delete(id);
   }
+
+  @Get(':id/processos')
+  buscarProcesso(@Param('id') id: string){
+    return this.disciplinasService.buscarProcesso(id)
+  }
+  @Get(':id/periodos-letivos')
+  buscarPeriodoLetivo(@Param('id') id: string){
+    return this.disciplinasService.buscarPeriodoLetivo(id)
+  }
 }

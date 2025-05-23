@@ -10,8 +10,9 @@ import { PeriodosLetivos, PeriodosLetivosSchema } from 'src/periodos-letivos/sch
   imports: [
     MongooseModule.forFeature([
       { name: Processo.name, schema: ProcessoSchema },
-      { name: PeriodosLetivos.name, schema: PeriodosLetivosSchema },]),
-  ],
+      { name: PeriodosLetivos.name, schema: PeriodosLetivosSchema },
+      
+    ])],
   controllers: [ProcessosController],
   providers: [ProcessosService],
 })

@@ -4,12 +4,14 @@ import { DisciplinasService } from './disciplinas.service';
 import { DisciplinasController } from './disciplinas.controller';
 import { Disciplina, DisciplinaSchema } from './schema/disciplinas.schema';
 import { PeriodosLetivos, PeriodosLetivosSchema } from '../periodos-letivos/schema/periodos-letivos.schema';
+import { Processo, ProcessoSchema } from 'src/processos/schema/processos.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Disciplina.name, schema: DisciplinaSchema },
-      { name: PeriodosLetivos.name, schema: PeriodosLetivosSchema } 
+      { name: Processo.name, schema: ProcessoSchema },
+      { name: PeriodosLetivos.name, schema: PeriodosLetivosSchema },
     ]),
   ],
   controllers: [DisciplinasController],

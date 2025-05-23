@@ -13,9 +13,9 @@ export class TurmasService {
   ) {}
 
   async create(dto: CreateTurmaDto): Promise<Turma> {
-    const jaExiste = await this.turmaModel.findOne({ codigoTurma: dto.codigoTurma });
-    if (jaExiste) {
-      throw new ConflictException('ERROR - Já existe uma turma com esse código');
+    const existeTurma = await this.turmaModel.findOne({ codigoTurma: dto.codigoTurma });
+    if (existeTurma) {
+      throw new ConflictException('Já existe uma turma com esse código.');
     }
 
     const novaTurma = new this.turmaModel(dto);
@@ -23,13 +23,17 @@ export class TurmasService {
   }
 
   async findAll(): Promise<Turma[]> {
-    return this.turmaModel.find();
+    const turmas = await this.turmaModel.find();
+    if (!turmas.length) {
+      throw new NotFoundException('Nenhuma turma encontrada.');
+    }
+    return turmas;
   }
 
   async findById(id: string): Promise<Turma> {
     const turma = await this.turmaModel.findById(id);
     if (!turma) {
-      throw new NotFoundException('ERROR - Turma não encontrada!');
+      throw new NotFoundException('Turma não encontrada.');
     }
     return turma;
   }
@@ -37,17 +41,29 @@ export class TurmasService {
   async update(id: string, dto: UpdateTurmaDto): Promise<Turma> {
     const atualizada = await this.turmaModel.findByIdAndUpdate(id, dto, { new: true });
     if (!atualizada) {
-      throw new NotFoundException('ERROR - Turma não foi atualizada/encontrada!');
+      throw new NotFoundException('Não foi possível atualizar: turma não encontrada.');
     }
     return atualizada;
   }
 
   async delete(id: string): Promise<{ message: string }> {
-    const resultado = await this.turmaModel.findByIdAndDelete(id);
-    if (!resultado) {
-      throw new NotFoundException('ERROR - Turma não encontrada!');
+    const deletada = await this.turmaModel.findByIdAndDelete(id);
+    if (!deletada) {
+      throw new NotFoundException('Turma não encontrada para exclusão.');
+    }
+    return { message: 'Turma excluída com sucesso.' };
+  }
+
+  async buscarProcesso(id: string): Promise<Turma> {
+    const turma = await this.turmaModel
+      .findById(id)
+      .populate('processoID')
+      .lean();
+
+    if (!turma) {
+      throw new NotFoundException('Processo vinculado não encontrado.');
     }
 
-    return { message: 'Turma excluída com sucesso.' };
+    return turma;
   }
 }

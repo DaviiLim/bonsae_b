@@ -1,6 +1,6 @@
 export enum DisciplinasEstadoEnum{
   
-  ATIVA = 'ativa',
-  INATIVA = 'inativa'
+  ATIVA = 'ATIVA',
+  INATIVA = 'INATIVA'
 
 }

@@ -4,7 +4,7 @@ import { UsuariosPerfilEnum } from '../enum/usuariosPerfil.enum';
 
 export type UsuarioDocument = Usuario & Document;
 
-@Schema({ timestamps: true, collection: 'usuarios' })
+@Schema({ collection: 'usuarios' })
 export class Usuario {
 
   @Prop({ required: true, enum: UsuariosPerfilEnum })
