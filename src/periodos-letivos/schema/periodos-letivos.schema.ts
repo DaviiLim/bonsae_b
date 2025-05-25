@@ -1,5 +1,4 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { IsMongoId } from 'class-validator';
 import { Document, Types } from 'mongoose';
 
 export type PeriodosLetivosDocument = PeriodosLetivos & Document;

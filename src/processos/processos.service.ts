@@ -8,10 +8,9 @@ import { PeriodosLetivos, PeriodosLetivosDocument } from '../periodos-letivos/sc
 export class ProcessosService {
   constructor(
     @InjectModel(Processo.name) private readonly processoModel: Model<ProcessoDocument>,
-    @InjectModel(PeriodosLetivos.name) private readonly periodoLetivoModel: Model<PeriodosLetivosDocument>,
   ) {}
 
-  async criarProcesso(processoID: string): Promise<Processo> {
+  async create(processoID: string): Promise<Processo> {
 
   const jaExiste = await this.processoModel.findOne({ processoID });
   if (jaExiste) {
@@ -28,11 +27,11 @@ export class ProcessosService {
 }
 
 
-  async listarProcessos(): Promise<Processo[]> {
+  async find(): Promise<Processo[]> {
     return this.processoModel.find();
   }
 
-  async buscarPorId(_id: string): Promise<Processo> {
+  async findById(_id: string): Promise<Processo> {
     if (!Types.ObjectId.isValid(_id)) {
       throw new NotFoundException('ID inválido');
     }
@@ -41,6 +40,19 @@ export class ProcessosService {
     if (!processo) throw new NotFoundException('Processo não encontrado');
 
     return processo;
+  }
+
+  async delete(_id: string): Promise<string> {
+    if (!Types.ObjectId.isValid(_id)) {
+      throw new NotFoundException('ID inválido');
+    }
+
+    const processo = await this.processoModel.findById(_id);
+    if (!processo) throw new NotFoundException('Processo não encontrado');
+
+    await this.processoModel.findByIdAndDelete(_id);
+
+    return 'O processo foi deletado com sucesso !'
   }
 
   async concluirProcesso(_id: string): Promise<Processo> {

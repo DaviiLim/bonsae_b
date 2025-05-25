@@ -1,43 +1,58 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus } from '@nestjs/common';
 import { DisciplinasService } from './disciplinas.service';
 import { CreateDisciplinaDto } from './dto/create-disciplina.dto';
 import { UpdateDisciplinaDto } from './dto/update-disciplina.dto';
+import { Disciplina } from './schema/disciplinas.schema';
 
 @Controller('disciplinas')
 export class DisciplinasController {
   constructor(private readonly disciplinasService: DisciplinasService) {}
 
   @Post()
-  create(@Body() createDisciplinaDto: CreateDisciplinaDto) {
-    return this.disciplinasService.create(createDisciplinaDto);
+  @HttpCode(HttpStatus.CREATED)
+  async create(@Body() createDisciplinaDto: CreateDisciplinaDto) {
+    return await this.disciplinasService.create(createDisciplinaDto);
   }
 
   @Get()
-  findAll() {
-    return this.disciplinasService.findAll();
+  @HttpCode(HttpStatus.OK)
+  async findAll() {
+    return await this.disciplinasService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.disciplinasService.findById(id);
+  @HttpCode(HttpStatus.OK)
+  async findOne(@Param('id') id: string) {
+    return await this.disciplinasService.findById(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDisciplinaDto: UpdateDisciplinaDto) {
-    return this.disciplinasService.update(id, updateDisciplinaDto);
+  @HttpCode(HttpStatus.OK)
+  async update(@Param('id') id: string, @Body() updateDisciplinaDto: UpdateDisciplinaDto) {
+    return await this.disciplinasService.update(id, updateDisciplinaDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.disciplinasService.delete(id);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async remove(@Param('id') id: string) {
+    await this.disciplinasService.delete(id);
   }
 
-  @Get(':id/processos')
-  buscarProcesso(@Param('id') id: string){
-    return this.disciplinasService.buscarProcesso(id)
+  @Post('many')
+  @HttpCode(HttpStatus.CREATED)
+  async createMany(@Body() dtos: CreateDisciplinaDto[]): Promise<Disciplina[]> {
+    return await this.disciplinasService.createMany(dtos);
   }
-  @Get(':id/periodos-letivos')
-  buscarPeriodoLetivo(@Param('id') id: string){
-    return this.disciplinasService.buscarPeriodoLetivo(id)
+
+  @Get('processos/:id')
+  @HttpCode(HttpStatus.OK)
+  async buscarProcesso(@Param('id') id: string) {
+    return await this.disciplinasService.buscarProcesso(id);
+  }
+
+  @Get('periodos-letivos/:id')
+  @HttpCode(HttpStatus.OK)
+  async buscarPeriodoLetivo(@Param('id') id: string) {
+    return await this.disciplinasService.buscarPeriodoLetivo(id);
   }
 }

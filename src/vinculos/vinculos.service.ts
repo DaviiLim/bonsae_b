@@ -1,26 +1,181 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, Types } from 'mongoose';
 import { CreateVinculoDto } from './dto/create-vinculo.dto';
 import { UpdateVinculoDto } from './dto/update-vinculo.dto';
+import { Usuario } from 'src/usuarios/schema/usuarios.schema';
+import { VinculoAluno, VinculoAlunoDocument } from './schema/vinculo-aluno-turma.schema';
+import { VinculoProfessor, VinculoProfessorDocument } from './schema/vinculo-professor-turma.schema';
+import { UsuariosPerfilEnum } from 'src/usuarios/enum/usuariosPerfil.enum';
 
 @Injectable()
 export class VinculosService {
-  create(createVinculoDto: CreateVinculoDto) {
-    return 'This action adds a new vinculo';
+  constructor(
+    @InjectModel(Usuario.name) private readonly usuarioModel: Model<Usuario>,
+    @InjectModel(VinculoAluno.name) private readonly vinculoAlunoModel: Model<VinculoAlunoDocument>,
+    @InjectModel(VinculoProfessor.name) private readonly vinculoProfessorModel: Model<VinculoProfessorDocument>,
+  ) {}
+
+  async create(dto: CreateVinculoDto) {
+    const { email, disciplinaID, turmaID } = dto;
+
+    const usuario = await this.usuarioModel.findOne({ email });
+    if (!usuario) {
+        throw new NotFoundException('Usuário não encontrado.');
+    }
+
+    if (!usuario.processoID) {
+        throw new BadRequestException('Usuário não possui processo associado.');
+    }
+
+    const disciplinaObjectId = new Types.ObjectId(disciplinaID);
+    const turmaObjectId = new Types.ObjectId(turmaID);
+
+    if (usuario.perfil === UsuariosPerfilEnum.ALUNO) {
+
+        const vinculoExistente = await this.vinculoAlunoModel.findOne({
+            alunoID: usuario._id,
+            disciplinaID: disciplinaObjectId,
+            turmaID: turmaObjectId,
+        });
+
+        if (vinculoExistente) {
+            throw new ConflictException('Vínculo de aluno já existe.');
+        }
+
+        const novoVinculo = await this.vinculoAlunoModel.create({
+            alunoID: usuario._id,
+            processoID: usuario.processoID,
+            disciplinaID: disciplinaObjectId,
+            turmaID: turmaObjectId,
+        });
+
+        return novoVinculo;
+
+    } else if (usuario.perfil === UsuariosPerfilEnum.PROFESSOR) {
+
+        const vinculoExistente = await this.vinculoProfessorModel.findOne({
+            professorID: usuario._id,
+            disciplinaID: disciplinaObjectId,
+            turmaID: turmaObjectId,
+        });
+
+        if (vinculoExistente) {
+            throw new ConflictException('Vínculo de professor já existe.');
+        }
+
+        const novoVinculo = await this.vinculoProfessorModel.create({
+            professorID: usuario._id,
+            processoID: usuario.processoID,
+            disciplinaID: disciplinaObjectId,
+            turmaID: turmaObjectId,
+        });
+
+        return novoVinculo;
+
+    } else {
+        throw new BadRequestException('Perfil do usuário inválido para vínculo.');
+    }
+}
+
+  async findAll() {
+    const alunos = await this.vinculoAlunoModel.find();
+    const professores = await this.vinculoProfessorModel.find();
+
+    if (!alunos.length && !professores.length) {
+      throw new NotFoundException('Nenhum vínculo encontrado.');
+    }
+
+    return { alunos, professores };
   }
 
-  findAll() {
-    return `This action returns all vinculos`;
+  async findById(id: string) {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('ID inválido.');
+    }
+
+    let vinculo = await this.vinculoAlunoModel.findById(id);
+    if (vinculo) return { tipo: 'aluno', vinculo };
+
+    vinculo = await this.vinculoProfessorModel.findById(id);
+    if (vinculo) return { tipo: 'professor', vinculo };
+
+    throw new NotFoundException('Vínculo não encontrado.');
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} vinculo`;
+async update(id: string, dto: UpdateVinculoDto) {
+
+    if (!Types.ObjectId.isValid(id)) {
+        throw new BadRequestException('ID inválido');
+    }
+
+    const alunoAtualizado = await this.vinculoAlunoModel.findByIdAndUpdate(
+        id,
+        { $set: dto },
+        { new: true }
+    );
+
+    if (alunoAtualizado) {
+        return alunoAtualizado;
+    }
+
+
+    const professorAtualizado = await this.vinculoProfessorModel.findByIdAndUpdate(
+        id,
+        { $set: dto },
+        { new: true }
+    );
+
+    if (professorAtualizado) {
+        return professorAtualizado;
+    }
+
+    throw new NotFoundException('Vínculo não encontrado');
+}
+
+  async delete(id: string) {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('ID inválido.');
+    }
+
+    let excluido = await this.vinculoAlunoModel.findByIdAndDelete(id);
+    if (excluido) {
+      return { message: 'Vínculo de aluno excluído com sucesso.' };
+    }
+
+    excluido = await this.vinculoProfessorModel.findByIdAndDelete(id);
+    if (excluido) {
+      return { message: 'Vínculo de professor excluído com sucesso.' };
+    }
+
+    throw new NotFoundException('Vínculo não encontrado para exclusão.');
   }
 
-  update(id: number, updateVinculoDto: UpdateVinculoDto) {
-    return `This action updates a #${id} vinculo`;
+  async buscarVinculoComProcesso(id: string) {
+  if (!Types.ObjectId.isValid(id)) {
+    throw new BadRequestException('ID inválido.');
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} vinculo`;
+  const vinculoAluno = await this.vinculoAlunoModel
+    .findById(id)
+    .populate('processoID')
+    .lean();
+
+  if (vinculoAluno) {
+    return vinculoAluno;
   }
+
+  const vinculoProfessor = await this.vinculoProfessorModel
+    .findById(id)
+    .populate('processoID')
+    .lean();
+
+  if (vinculoProfessor) {
+    return vinculoProfessor;
+  }
+
+  throw new NotFoundException('Vínculo não encontrado.');
+}
+
+  
 }

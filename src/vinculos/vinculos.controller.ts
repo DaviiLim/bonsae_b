@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus } from '@nestjs/common';
 import { VinculosService } from './vinculos.service';
 import { CreateVinculoDto } from './dto/create-vinculo.dto';
 import { UpdateVinculoDto } from './dto/update-vinculo.dto';
@@ -8,27 +8,39 @@ export class VinculosController {
   constructor(private readonly vinculosService: VinculosService) {}
 
   @Post()
-  create(@Body() createVinculoDto: CreateVinculoDto) {
-    return this.vinculosService.create(createVinculoDto);
+  @HttpCode(HttpStatus.CREATED)
+  async create(@Body() dto: CreateVinculoDto) {
+    return await this.vinculosService.create(dto);
   }
 
   @Get()
-  findAll() {
-    return this.vinculosService.findAll();
+  @HttpCode(HttpStatus.OK)
+  async findAll() {
+    return await this.vinculosService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.vinculosService.findOne(+id);
+  @HttpCode(HttpStatus.OK)
+  async findById(@Param('id') id: string) {
+    return await this.vinculosService.findById(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateVinculoDto: UpdateVinculoDto) {
-    return this.vinculosService.update(+id, updateVinculoDto);
+  @HttpCode(HttpStatus.OK)
+  async update(@Param('id') id: string, @Body() dto: UpdateVinculoDto) {
+    return await this.vinculosService.update(id, dto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.vinculosService.remove(+id);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async delete(@Param('id') id: string) {
+    await this.vinculosService.delete(id);
   }
+
+  @Get('processo/:id')
+  async buscarVinculoComProcesso(@Param('id') id: string) {
+  return this.vinculosService.buscarVinculoComProcesso(id);
+}
+
+
 }

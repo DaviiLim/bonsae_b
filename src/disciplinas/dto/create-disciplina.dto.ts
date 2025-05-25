@@ -5,8 +5,7 @@ import { DisciplinasEstadoEnum } from '../enum/disciplinasEstado.enum';
 export class CreateDisciplinaDto {
   
   @IsNotEmpty()
-  @IsArray()
-  @IsMongoId({ each: true })
+  @IsMongoId()
   periodosLetivosID: string;
 
   @IsNotEmpty()

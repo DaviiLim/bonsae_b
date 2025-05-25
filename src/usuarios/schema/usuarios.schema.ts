@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 import { UsuariosPerfilEnum } from '../enum/usuariosPerfil.enum';
 
 export type UsuarioDocument = Usuario & Document;
@@ -9,6 +9,9 @@ export class Usuario {
 
   @Prop({ required: true, enum: UsuariosPerfilEnum })
   perfil: UsuariosPerfilEnum;
+
+  @Prop({ type: Types.ObjectId, ref: 'Processo', required: true })
+  processoID: Types.ObjectId;
 
   @Prop()
   subperfil?: string;

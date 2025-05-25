@@ -1,21 +1,36 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Turma, TurmaDocument } from './schema/turmas.schema';
 import { CreateTurmaDto } from './dto/create-turma.dto';
 import { UpdateTurmaDto } from './dto/update-turma.dto';
+import { Processo, ProcessoDocument } from 'src/processos/schema/processos.schema';
+import { Disciplina, DisciplinaDocument } from 'src/disciplinas/schema/disciplinas.schema';
 
 @Injectable()
 export class TurmasService {
   constructor(
-    @InjectModel(Turma.name)
-    private readonly turmaModel: Model<TurmaDocument>,
+    
+    @InjectModel(Turma.name) private readonly turmaModel: Model<TurmaDocument>,
+    @InjectModel(Processo.name) private readonly processoModel: Model<ProcessoDocument>,
+    @InjectModel(Disciplina.name) private readonly disciplinaModel: Model<DisciplinaDocument>
+
   ) {}
 
   async create(dto: CreateTurmaDto): Promise<Turma> {
     const existeTurma = await this.turmaModel.findOne({ codigoTurma: dto.codigoTurma });
     if (existeTurma) {
       throw new ConflictException('Já existe uma turma com esse código.');
+    }
+
+    const disciplinaExiste = await this.disciplinaModel.findById(dto.disciplinaCodigo);
+    if (!disciplinaExiste) {
+      throw new NotFoundException('Disciplina informada não existe.');
+    }
+
+    const processoExiste = await this.processoModel.findById(dto.processoID);
+    if (!processoExiste) {
+      throw new NotFoundException('Processo informado não existe.');
     }
 
     const novaTurma = new this.turmaModel(dto);
@@ -31,6 +46,10 @@ export class TurmasService {
   }
 
   async findById(id: string): Promise<Turma> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new NotFoundException('ID inválido.');
+    }
+
     const turma = await this.turmaModel.findById(id);
     if (!turma) {
       throw new NotFoundException('Turma não encontrada.');
@@ -39,6 +58,10 @@ export class TurmasService {
   }
 
   async update(id: string, dto: UpdateTurmaDto): Promise<Turma> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new NotFoundException('ID inválido.');
+    }
+
     const atualizada = await this.turmaModel.findByIdAndUpdate(id, dto, { new: true });
     if (!atualizada) {
       throw new NotFoundException('Não foi possível atualizar: turma não encontrada.');
@@ -47,14 +70,23 @@ export class TurmasService {
   }
 
   async delete(id: string): Promise<{ message: string }> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new NotFoundException('ID inválido.');
+    }
+
     const deletada = await this.turmaModel.findByIdAndDelete(id);
     if (!deletada) {
       throw new NotFoundException('Turma não encontrada para exclusão.');
     }
+
     return { message: 'Turma excluída com sucesso.' };
   }
 
   async buscarProcesso(id: string): Promise<Turma> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new NotFoundException('ID inválido.');
+    }
+
     const turma = await this.turmaModel
       .findById(id)
       .populate('processoID')
@@ -62,6 +94,23 @@ export class TurmasService {
 
     if (!turma) {
       throw new NotFoundException('Processo vinculado não encontrado.');
+    }
+
+    return turma;
+  }
+
+  async buscarDisciplina(id: string): Promise<Turma> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new NotFoundException('ID inválido.');
+    }
+
+    const turma = await this.turmaModel
+      .findById(id)
+      .populate('disciplinaCodigo')
+      .lean();
+
+    if (!turma) {
+      throw new NotFoundException('Disciplina vinculada não encontrada.');
     }
 
     return turma;

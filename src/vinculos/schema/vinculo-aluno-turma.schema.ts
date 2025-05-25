@@ -1,12 +1,12 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document, Types } from 'mongoose';
 
-export type VinculoProfessorDocument = VinculoProfessor & Document;
+export type VinculoAlunoDocument = VinculoAluno & Document;
 
 @Schema({ timestamps: true })
-export class VinculoProfessor extends Document {
+export class VinculoAluno extends Document {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Usuario', required: true })
-  professorID: Types.ObjectId;
+  alunoID: Types.ObjectId;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Processo', required: true })
   processoID: Types.ObjectId;
@@ -18,4 +18,4 @@ export class VinculoProfessor extends Document {
   turmaID: Types.ObjectId;
 }
 
-export const VinculoProfessorSchema = SchemaFactory.createForClass(VinculoProfessor);
+export const VinculoAlunoSchema = SchemaFactory.createForClass(VinculoAluno);

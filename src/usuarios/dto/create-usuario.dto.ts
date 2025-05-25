@@ -13,6 +13,10 @@ export class CreateUsuarioDto {
 
   @IsNotEmpty()
   @IsString()
+  processoID: string;
+
+  @IsNotEmpty()
+  @IsString()
   nome: string;
 
   @IsOptional()

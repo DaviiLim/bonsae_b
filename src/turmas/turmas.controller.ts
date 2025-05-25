@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Param, Body, Patch, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus } from '@nestjs/common';
 import { TurmasService } from './turmas.service';
 import { CreateTurmaDto } from './dto/create-turma.dto';
 import { UpdateTurmaDto } from './dto/update-turma.dto';
@@ -8,27 +8,44 @@ export class TurmasController {
   constructor(private readonly turmasService: TurmasService) {}
 
   @Post()
+  @HttpCode(HttpStatus.CREATED)
   async create(@Body() dto: CreateTurmaDto) {
-    return this.turmasService.create(dto);
+    return await this.turmasService.create(dto);
   }
 
   @Get()
+  @HttpCode(HttpStatus.OK)
   async findAll() {
-    return this.turmasService.findAll();
+    return await this.turmasService.findAll();
   }
 
   @Get(':id')
+  @HttpCode(HttpStatus.OK)
   async findById(@Param('id') id: string) {
-    return this.turmasService.findById(id);
+    return await this.turmasService.findById(id);
   }
 
   @Patch(':id')
+  @HttpCode(HttpStatus.OK)
   async update(@Param('id') id: string, @Body() dto: UpdateTurmaDto) {
-    return this.turmasService.update(id, dto);
+    return await this.turmasService.update(id, dto);
   }
 
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   async delete(@Param('id') id: string) {
-    return this.turmasService.delete(id);
+    await this.turmasService.delete(id);
+  }
+
+  @Get('processo/:id')
+  @HttpCode(HttpStatus.OK)
+  async getProcesso(@Param('id') id: string) {
+    return await this.turmasService.buscarProcesso(id);
+  }
+
+  @Get('disciplina/:id')
+  @HttpCode(HttpStatus.OK)
+  async getDisciplina(@Param('id') id: string) {
+    return await this.turmasService.buscarDisciplina(id);
   }
 }

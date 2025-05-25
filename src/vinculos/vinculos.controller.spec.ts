@@ -1,20 +1,41 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { VinculosController } from './vinculos.controller';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus } from '@nestjs/common';
 import { VinculosService } from './vinculos.service';
+import { CreateVinculoDto } from './dto/create-vinculo.dto';
+import { UpdateVinculoDto } from './dto/update-vinculo.dto';
 
-describe('VinculosController', () => {
-  let controller: VinculosController;
+@Controller('vinculos')
+export class VinculosController {
+  constructor(private readonly vinculosService: VinculosService) {}
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [VinculosController],
-      providers: [VinculosService],
-    }).compile();
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  async create(@Body() dto: CreateVinculoDto) {
+    return await this.vinculosService.create(dto);
+  }
 
-    controller = module.get<VinculosController>(VinculosController);
-  });
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  async findAll() {
+    return await this.vinculosService.findAll();
+  }
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
-  });
-});
+  @Get(':id')
+  @HttpCode(HttpStatus.OK)
+  async findById(@Param('id') id: string) {
+    return await this.vinculosService.findById(id);
+  }
+
+  @Patch(':id')
+  @HttpCode(HttpStatus.OK)
+  async update(@Param('id') id: string, @Body() dto: UpdateVinculoDto) {
+    return await this.vinculosService.update(id, dto);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async delete(@Param('id') id: string) {
+    await this.vinculosService.delete(id);
+  }
+
+  
+}

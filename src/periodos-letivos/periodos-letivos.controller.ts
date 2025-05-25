@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus } from '@nestjs/common';
 import { PeriodosLetivosService } from './periodos-letivos.service';
 import { CreatePeriodosLetivoDto } from './dto/create-periodos-letivo.dto';
 import { UpdatePeriodosLetivoDto } from './dto/update-periodos-letivo.dto';
@@ -8,32 +8,38 @@ export class PeriodosLetivosController {
   constructor(private readonly periodosLetivosService: PeriodosLetivosService) {}
 
   @Post()
-  create(@Body() createPeriodosLetivoDto: CreatePeriodosLetivoDto) {
-    return this.periodosLetivosService.create(createPeriodosLetivoDto);
+  @HttpCode(HttpStatus.CREATED)
+  async create(@Body() createPeriodosLetivoDto: CreatePeriodosLetivoDto) {
+    return await this.periodosLetivosService.create(createPeriodosLetivoDto);
   }
 
   @Get()
-  findAll() {
-    return this.periodosLetivosService.findAll();
+  @HttpCode(HttpStatus.OK)
+  async findAll() {
+    return await this.periodosLetivosService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.periodosLetivosService.findById(id);
+  @HttpCode(HttpStatus.OK)
+  async findOne(@Param('id') id: string) {
+    return await this.periodosLetivosService.findById(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePeriodosLetivoDto: UpdatePeriodosLetivoDto) {
-    return this.periodosLetivosService.update(id, updatePeriodosLetivoDto);
+  @HttpCode(HttpStatus.OK)
+  async update(@Param('id') id: string, @Body() updatePeriodosLetivoDto: UpdatePeriodosLetivoDto) {
+    return await this.periodosLetivosService.update(id, updatePeriodosLetivoDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.periodosLetivosService.delete(id);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async remove(@Param('id') id: string) {
+    await this.periodosLetivosService.delete(id);
   }
 
-  @Get(':id/processos')
-  buscarProcesso(@Param('id') id: string){
-    return this.periodosLetivosService.buscarProcesso(id)
+  @Get('processos/:id')
+  @HttpCode(HttpStatus.OK)
+  async buscarProcesso(@Param('id') id: string) {
+    return await this.periodosLetivosService.buscarProcesso(id);
   }
 }

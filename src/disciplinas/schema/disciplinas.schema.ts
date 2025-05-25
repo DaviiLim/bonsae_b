@@ -8,8 +8,8 @@ export type DisciplinaDocument = Disciplina & Document;
 @Schema({ collection: 'disciplinas' })
 export class Disciplina {
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PeriodosLetivos' }] })
-  periodosLetivosID: Types.ObjectId[];
+@Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'PeriodosLetivos', required: true })
+periodosLetivosID: Types.ObjectId;
 
 
   @Prop({ type: Types.ObjectId, ref: 'Processo', required: true })
