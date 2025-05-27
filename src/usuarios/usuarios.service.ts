@@ -18,9 +18,14 @@ export class UsuariosService {
       throw new ConflictException('processoID é obrigatório.');
     }
 
-    const usuarioExistente = await this.usuarioModel.findOne({ email: dto.email });
-    if (usuarioExistente) {
+    const usuarioExistenteEmail = await this.usuarioModel.findOne({ email: dto.email });
+    if (usuarioExistenteEmail) {
       throw new ConflictException('Já existe um usuário com este e-mail.');
+    }
+
+    const usuarioExistenteCpf = await this.usuarioModel.findOne({ cpf: dto.cpf });
+    if (usuarioExistenteCpf) {
+      throw new ConflictException(`Já existe um usuário com este ${dto.cpf}.`);
     }
 
     const processoExiste = await this.processoModel.findById(dto.processoID);
