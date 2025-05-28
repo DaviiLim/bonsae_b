@@ -16,18 +16,6 @@ import { VinculosModule } from './vinculos/vinculos.module';
 
     // MongoDB
     MongooseModule.forRoot('mongodb://localhost:27017/bonsae_db'),
-    // Muito provavelmente irei um arquivo para dividir melhor -> (env) <-
-    // PostgreSQL -> Estou configurando... - davi :)
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: '123456',
-      database: 'meu_banco',
-      autoLoadEntities: true,
-      synchronize: true, 
-    }),
 
     PeriodosLetivosModule,
     DisciplinasModule,
