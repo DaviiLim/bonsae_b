@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { PeriodoLetivoEnum } from '../enum/periodo-letivo.enum';
 
 export type PeriodosLetivosDocument = PeriodosLetivos & Document;
 
@@ -12,8 +13,10 @@ export class PeriodosLetivos {
   @Prop({ type: Types.ObjectId, ref: 'Processo', required: true })
   processoID: Types.ObjectId;
 
-  @Prop({ required: true })
-  periodoLetivo: string;
+  @Prop({ required: true,
+    enum:PeriodoLetivoEnum,
+   })
+  periodoLetivo: PeriodoLetivoEnum;
 
   @Prop({ required: true })
   dataInicial: Date;

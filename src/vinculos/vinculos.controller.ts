@@ -9,8 +9,8 @@ export class VinculosController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() dto: CreateVinculoDto) {
-    return await this.vinculosService.create(dto);
+  async create(@Body() dto: CreateVinculoDto[]) {
+    return await this.vinculosService.createMany(dto);
   }
 
   @Get()

@@ -1,16 +1,16 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus } from '@nestjs/common';
 import { UsuariosService } from './usuarios.service';
-import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
+import { CreateUsuariosArrayDto } from './dto/create-usuario.dto';
 
 @Controller('usuarios')
 export class UsuariosController {
   constructor(private readonly usuariosService: UsuariosService) {}
 
-  @Post()
+  @Post('')
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() dto: CreateUsuarioDto) {
-    return await this.usuariosService.create(dto);
+  async createMany(@Body() dto: CreateUsuariosArrayDto) {
+    return this.usuariosService.createMany(dto);
   }
 
   @Get()

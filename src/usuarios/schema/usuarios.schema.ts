@@ -34,8 +34,8 @@ export class Usuario {
   @Prop()
   telefone?: string;
 
-  @Prop({ unique: true })
-  cpf?: string;
+  @Prop({ required: true})
+  cpf: string;
 
   @Prop({ required: true })
   senha: string;

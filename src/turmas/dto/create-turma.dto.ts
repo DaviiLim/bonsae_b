@@ -1,5 +1,6 @@
-import { IsEnum, IsMongoId, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { ArrayMinSize, IsArray, IsEnum, IsMongoId, IsNotEmpty, IsNumber, IsString, ValidateNested } from "class-validator";
 import { TurmasTurnoEnum } from "../enum/turmasTurno.enum";
+import { Type } from "class-transformer";
 
 export class CreateTurmaDto {
 
@@ -21,6 +22,14 @@ export class CreateTurmaDto {
 
   @IsNotEmpty()
   @IsNumber()
-  codigoTurma: number;
+  codigo: number;
 
+}
+
+export class CreateTurmaArrayDto {
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateTurmaDto)
+  @ArrayMinSize(1)
+  turmas: CreateTurmaDto[];
 }

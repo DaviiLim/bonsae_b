@@ -1,5 +1,6 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsString, IsEmail } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString, IsEmail, IsArray, ValidateNested, IsMongoId, ArrayMinSize } from 'class-validator';
 import { UsuariosPerfilEnum } from '../enum/usuariosPerfil.enum';
+import { Type } from 'class-transformer';
 
 export class CreateUsuarioDto {
 
@@ -12,7 +13,7 @@ export class CreateUsuarioDto {
   subperfil?: string;
 
   @IsNotEmpty()
-  @IsString()
+  @IsMongoId()
   processoID: string;
 
   @IsNotEmpty()
@@ -39,9 +40,9 @@ export class CreateUsuarioDto {
   @IsString()
   telefone?: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  cpf?: string;
+  cpf: string;
 
   @IsNotEmpty()
   @IsString()
@@ -54,4 +55,11 @@ export class CreateUsuarioDto {
   @IsOptional()
   @IsString()
   observacoes?: string;
+}
+
+export class CreateUsuariosArrayDto {
+  @ValidateNested({ each: true })
+  @Type(() => CreateUsuarioDto)
+  @ArrayMinSize(1)
+  usuarios: CreateUsuarioDto[];
 }

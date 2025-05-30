@@ -1,4 +1,5 @@
-import { IsEmail, IsMongoId, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { ArrayMinSize, IsEmail, IsMongoId, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 export class CreateVinculoDto {
   @IsNotEmpty()
@@ -16,4 +17,11 @@ export class CreateVinculoDto {
   @IsNotEmpty()
   @IsMongoId()
   turmaID: string;
+}
+
+export class CreateVinculosArrayDto {
+  @ValidateNested({ each: true })
+  @Type(() => CreateVinculoDto)
+  @ArrayMinSize(1)
+  usuarios: CreateVinculoDto[];
 }

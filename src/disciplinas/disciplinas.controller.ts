@@ -1,17 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, InternalServerErrorException, ConflictException, BadRequestException, ValidationPipe, UsePipes } from '@nestjs/common';
 import { DisciplinasService } from './disciplinas.service';
-import { CreateDisciplinaDto } from './dto/create-disciplina.dto';
+import { CreateDisciplinaDto, CreateDisciplinasArrayDto } from './dto/create-disciplina.dto';
 import { UpdateDisciplinaDto } from './dto/update-disciplina.dto';
-import { Disciplina } from './schema/disciplinas.schema';
 
 @Controller('disciplinas')
 export class DisciplinasController {
   constructor(private readonly disciplinasService: DisciplinasService) {}
 
-  @Post()
+  @Post('')
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() createDisciplinaDto: CreateDisciplinaDto) {
-    return await this.disciplinasService.create(createDisciplinaDto);
+  async create(@Body() dto: CreateDisciplinasArrayDto) {
+    return this.disciplinasService.create(dto);
   }
 
   @Get()
@@ -38,21 +37,9 @@ export class DisciplinasController {
     await this.disciplinasService.delete(id);
   }
 
-  @Post('many')
-  @HttpCode(HttpStatus.CREATED)
-  async createMany(@Body() dtos: CreateDisciplinaDto[]): Promise<Disciplina[]> {
-    return await this.disciplinasService.createMany(dtos);
-  }
-
-  @Get('processos/:id')
-  @HttpCode(HttpStatus.OK)
-  async buscarProcesso(@Param('id') id: string) {
-    return await this.disciplinasService.buscarProcesso(id);
-  }
-
-  @Get('periodos-letivos/:id')
-  @HttpCode(HttpStatus.OK)
-  async buscarPeriodoLetivo(@Param('id') id: string) {
-    return await this.disciplinasService.buscarPeriodoLetivo(id);
-  }
+@Get('processos/:id/disciplinas')
+@HttpCode(HttpStatus.OK)
+async findProcesso(@Param('id') id: string) {
+  return this.disciplinasService.findProcesso(id);
+}
 }

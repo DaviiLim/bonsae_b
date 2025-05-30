@@ -1,10 +1,10 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Usuario, UsuarioDocument } from './schema/usuarios.schema';
-import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { Processo, ProcessoDocument } from 'src/processos/schema/processos.schema';
+import { CreateUsuariosArrayDto } from './dto/create-usuario.dto';
 
 @Injectable()
 export class UsuariosService {
@@ -13,29 +13,35 @@ export class UsuariosService {
     @InjectModel(Processo.name) private readonly processoModel: Model<ProcessoDocument>,
   ) {}
 
-  async create(dto: CreateUsuarioDto): Promise<Usuario> {
-    if (!dto.processoID) {
-      throw new ConflictException('processoID é obrigatório.');
-    }
+  async createMany(dto: CreateUsuariosArrayDto): Promise<Usuario[]> {
+  const { usuarios } = dto;
 
-    const usuarioExistenteEmail = await this.usuarioModel.findOne({ email: dto.email });
-    if (usuarioExistenteEmail) {
-      throw new ConflictException('Já existe um usuário com este e-mail.');
-    }
+  const processoID = usuarios[0].processoID;
 
-    const usuarioExistenteCpf = await this.usuarioModel.findOne({ cpf: dto.cpf });
-    if (usuarioExistenteCpf) {
-      throw new ConflictException(`Já existe um usuário com este ${dto.cpf}.`);
-    }
-
-    const processoExiste = await this.processoModel.findById(dto.processoID);
-    if (!processoExiste) {
-      throw new NotFoundException('Processo informado não existe.');
-    }
-
-    const novoUsuario = new this.usuarioModel(dto);
-    return novoUsuario.save();
+  const processoExiste = await this.processoModel.exists({ _id: processoID });
+  if (!processoExiste) {
+    throw new BadRequestException(`Processo ${processoID} não encontrado`);
   }
+
+  const emails = usuarios.map((u) => u.email);
+  const emailsDuplicados = await this.usuarioModel.find({
+    email: { $in: emails },
+  });
+
+  if (emailsDuplicados.length > 0) {
+    const emailsExistentes = emailsDuplicados.map((u) => u.email).join(' | ');
+    throw new BadRequestException(`Os seguintes e-mails já estão em uso: ${emailsExistentes}`);
+  }
+
+  const usuariosParaInserir = usuarios.map((u) => ({
+    ...u,
+    email: u.email,
+    cpf: u.cpf,
+    senha: u.senha
+  }));
+
+  return await this.usuarioModel.insertMany(usuariosParaInserir, { ordered: true });
+}
 
   async findAll(): Promise<Usuario[]> {
     const usuarios = await this.usuarioModel.find().lean();

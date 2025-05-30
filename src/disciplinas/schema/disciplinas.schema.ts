@@ -8,9 +8,8 @@ export type DisciplinaDocument = Disciplina & Document;
 @Schema({ collection: 'disciplinas' })
 export class Disciplina {
 
-@Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'PeriodosLetivos', required: true })
-periodosLetivosID: Types.ObjectId;
-
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'PeriodosLetivos', required: true })
+  periodoLetivoID: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'Processo', required: true })
   processoID: Types.ObjectId;
@@ -36,19 +35,16 @@ periodosLetivosID: Types.ObjectId;
 })
 dataFim: Date;
 
-  @Prop({ 
-    required: true,
-    enum: DisciplinasCategoriaEnum
-  })
-  categoria: string;
+  @Prop({ enum: DisciplinasCategoriaEnum, required: true })
+  categoria: DisciplinasCategoriaEnum;
 
   @Prop()
   periodoCurricular?: string;
 
-  @Prop({ 
-    enum: DisciplinasEstadoEnum,
-    default: DisciplinasEstadoEnum.ATIVA
-   })
+  @Prop({
+    enum:DisciplinasEstadoEnum,
+    default:DisciplinasEstadoEnum.ATIVA
+  })
   estado?: string;
 
   @Prop()

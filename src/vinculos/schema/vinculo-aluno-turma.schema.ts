@@ -3,7 +3,7 @@ import mongoose, { Document, Types } from 'mongoose';
 
 export type VinculoAlunoDocument = VinculoAluno & Document;
 
-@Schema({ timestamps: true })
+@Schema({ timestamps: true, collection: 'vinculo-alunos' })
 export class VinculoAluno extends Document {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Usuario', required: true })
   alunoID: Types.ObjectId;

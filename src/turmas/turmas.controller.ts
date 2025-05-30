@@ -1,17 +1,18 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus } from '@nestjs/common';
 import { TurmasService } from './turmas.service';
-import { CreateTurmaDto } from './dto/create-turma.dto';
+import { CreateTurmaArrayDto, CreateTurmaDto } from './dto/create-turma.dto';
 import { UpdateTurmaDto } from './dto/update-turma.dto';
 
 @Controller('turmas')
 export class TurmasController {
   constructor(private readonly turmasService: TurmasService) {}
 
-  @Post()
+  @Post('')
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() dto: CreateTurmaDto) {
-    return await this.turmasService.create(dto);
-  }
+  async createMany(@Body() dto: CreateTurmaArrayDto) {
+  return this.turmasService.createMany(dto);
+}
+
 
   @Get()
   @HttpCode(HttpStatus.OK)
@@ -37,13 +38,13 @@ export class TurmasController {
     await this.turmasService.delete(id);
   }
 
-  @Get('processo/:id')
+  @Get(':id/processos')
   @HttpCode(HttpStatus.OK)
   async getProcesso(@Param('id') id: string) {
     return await this.turmasService.buscarProcesso(id);
   }
 
-  @Get('disciplina/:id')
+  @Get(':id/disciplina')
   @HttpCode(HttpStatus.OK)
   async getDisciplina(@Param('id') id: string) {
     return await this.turmasService.buscarDisciplina(id);

@@ -104,20 +104,8 @@ export class PeriodosLetivosService {
     return { message: 'Período letivo excluído com sucesso.' };
   }
 
-  async buscarProcesso(id: string): Promise<PeriodosLetivos> {
-    if (!Types.ObjectId.isValid(id)) {
-      throw new NotFoundException('ID inválido.');
-    }
-
-    const periodo = await this.periodoLetivoModel
-      .findById(id)
-      .populate('processoID')
-      .lean();
-
-    if (!periodo) {
-      throw new NotFoundException('Processo vinculado não encontrado.');
-    }
-
-    return periodo;
+  async buscarProcesso(processoID: string): Promise<PeriodosLetivos[]> {
+    return await this.periodoLetivoModel.find({ processoID })
   }
+
 }

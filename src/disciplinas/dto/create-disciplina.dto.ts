@@ -1,18 +1,19 @@
-import { IsArray, IsDateString, IsEnum, IsMongoId, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { ArrayMinSize, IsArray, IsDateString, IsEnum, IsMongoId, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { DisciplinasCategoriaEnum } from '../enum/disciplinasCategoria.enum';
 import { DisciplinasEstadoEnum } from '../enum/disciplinasEstado.enum';
+import { Type } from 'class-transformer';
 
 export class CreateDisciplinaDto {
-  
+    
   @IsNotEmpty()
   @IsMongoId()
-  periodosLetivosID: string;
+  periodoLetivoID: string;
 
   @IsNotEmpty()
   @IsMongoId()
   processoID: string;
 
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'O nome é obrigatório' })
   @IsString()
   nome: string;
 
@@ -29,18 +30,27 @@ export class CreateDisciplinaDto {
   dataFim: string;
 
   @IsNotEmpty()
-  @IsEnum(DisciplinasCategoriaEnum)
-  categoria: string;
+  @IsEnum(DisciplinasCategoriaEnum, { message: 'Essa categoria não existe !'})
+  categoria: DisciplinasCategoriaEnum;
 
   @IsOptional()
   @IsString()
   periodoCurricular?: string;
 
   @IsOptional()
-  @IsEnum(DisciplinasEstadoEnum)
-  estado?: string;
+  @IsEnum(DisciplinasEstadoEnum, {message: 'Esse estado não existe !'})
+  estado?: DisciplinasEstadoEnum;
 
   @IsOptional()
   @IsString()
   campus?: string;
 }
+
+export class CreateDisciplinasArrayDto {
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateDisciplinaDto)
+  @ArrayMinSize(1)
+  disciplinas: CreateDisciplinaDto[];
+}
+

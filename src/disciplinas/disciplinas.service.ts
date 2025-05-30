@@ -1,11 +1,21 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Disciplina, DisciplinaDocument } from './schema/disciplinas.schema';
-import { CreateDisciplinaDto } from './dto/create-disciplina.dto';
+import { CreateDisciplinaDto, CreateDisciplinasArrayDto } from './dto/create-disciplina.dto';
 import { UpdateDisciplinaDto } from './dto/update-disciplina.dto';
 import { Processo, ProcessoDocument } from 'src/processos/schema/processos.schema';
 import { PeriodosLetivos, PeriodosLetivosDocument } from 'src/periodos-letivos/schema/periodos-letivos.schema';
+import { DisciplinasCategoriaEnum } from './enum/disciplinasCategoria.enum';
+import { DisciplinasEstadoEnum } from './enum/disciplinasEstado.enum';
+import { plainToInstance } from 'class-transformer';
+import { validate } from 'class-validator';
+
+function validarObjectId(id: string, nomeCampo = 'ID'): void {
+  if (!Types.ObjectId.isValid(id)) {
+    throw new NotFoundException(`${nomeCampo} inválido.`);
+  }
+}
 
 @Injectable()
 export class DisciplinasService {
@@ -15,39 +25,34 @@ export class DisciplinasService {
     @InjectModel(Processo.name) private readonly processoModel: Model<ProcessoDocument>,
   ) {}
 
-  async create(dto: CreateDisciplinaDto): Promise<Disciplina> {
-    const existeCodigo = await this.disciplinaModel.findOne({ codigo: dto.codigo });
-    if (existeCodigo) {
-      throw new ConflictException('Já existe uma disciplina com esse código.');
-    }
+  async create(dto: CreateDisciplinasArrayDto): Promise<Disciplina[]> {
+  const { disciplinas } = dto;
 
-    const periodoExiste = await this.periodoLetivoModel.findById(dto.periodosLetivosID);
-    if (!periodoExiste) {
-      throw new NotFoundException('Período letivo informado não existe.');
-    }
+  const processoID = disciplinas[0].processoID;
+  const periodoLetivoID = disciplinas[0].periodoLetivoID;
 
-    const processoExiste = await this.processoModel.findById(dto.processoID);
-    if (!processoExiste) {
-      throw new NotFoundException('Processo informado não existe.');
-    }
-
-    const novaDisciplina = new this.disciplinaModel(dto);
-    return novaDisciplina.save();
+  const processoExiste = await this.processoModel.exists({ _id: processoID });
+  if (!processoExiste) {
+    throw new BadRequestException(`Processo ${processoID} não encontrado`);
   }
 
-   async createMany(dtos: CreateDisciplinaDto[]): Promise<Disciplina[]> {
-  const codigos = dtos.map(a => a.codigo);
-
-  const existentes = await this.disciplinaModel.find({ codigo: { $in: codigos } });
-  if (existentes.length > 0) {
-    const codigosExistentes = existentes.map(b => b.codigo).join(' | ');
-    throw new ConflictException(`Já existem disciplinas com os seguintes códigos ->  ${codigosExistentes}`);
+  const periodoExiste = await this.periodoLetivoModel.exists({ _id: periodoLetivoID });
+  if (!periodoExiste) {
+    throw new BadRequestException(`Período Letivo ${periodoLetivoID} não encontrado`);
   }
 
-  const documentos = await this.disciplinaModel.insertMany(dtos);
-  return documentos.map(doc => doc.toObject());
+  const codigos = disciplinas.map((d) => d.codigo);
+  const codigosDuplicados = await this.disciplinaModel.find({
+    codigo: { $in: codigos },
+  });
+
+  if (codigosDuplicados.length > 0) {
+    const codigosExistentes = codigosDuplicados.map((d) => d.codigo).join(' | ');
+    throw new BadRequestException(`Os seguintes códigos já existem: ${codigosExistentes}`);
   }
 
+  return await this.disciplinaModel.insertMany(disciplinas, { ordered: true });
+}
   async findAll(): Promise<Disciplina[]> {
     const disciplinas = await this.disciplinaModel.find();
     if (!disciplinas.length) {
@@ -57,9 +62,7 @@ export class DisciplinasService {
   }
 
   async findById(id: string): Promise<Disciplina> {
-    if (!Types.ObjectId.isValid(id)) {
-      throw new NotFoundException('ID inválido.');
-    }
+    validarObjectId(id, 'Disciplina');
 
     const disciplina = await this.disciplinaModel.findById(id);
     if (!disciplina) {
@@ -69,9 +72,7 @@ export class DisciplinasService {
   }
 
   async update(id: string, dto: UpdateDisciplinaDto): Promise<Disciplina> {
-    if (!Types.ObjectId.isValid(id)) {
-      throw new NotFoundException('ID inválido.');
-    }
+    validarObjectId(id, 'Disciplina');
 
     const atualizada = await this.disciplinaModel.findByIdAndUpdate(id, dto, { new: true });
     if (!atualizada) {
@@ -81,9 +82,7 @@ export class DisciplinasService {
   }
 
   async delete(id: string): Promise<{ message: string }> {
-    if (!Types.ObjectId.isValid(id)) {
-      throw new NotFoundException('ID inválido.');
-    }
+    validarObjectId(id, 'Disciplina');
 
     const deletada = await this.disciplinaModel.findByIdAndDelete(id);
     if (!deletada) {
@@ -93,37 +92,7 @@ export class DisciplinasService {
     return { message: 'Disciplina excluída com sucesso.' };
   }
 
-  async buscarProcesso(id: string): Promise<Disciplina> {
-    if (!Types.ObjectId.isValid(id)) {
-      throw new NotFoundException('ID inválido.');
-    }
-
-    const disciplina = await this.disciplinaModel
-      .findById(id)
-      .populate('processoID')
-      .lean();
-
-    if (!disciplina) {
-      throw new NotFoundException('Processo vinculado não encontrado.');
-    }
-
-    return disciplina;
-  }
-
-  async buscarPeriodoLetivo(id: string): Promise<Disciplina> {
-    if (!Types.ObjectId.isValid(id)) {
-      throw new NotFoundException('ID inválido.');
-    }
-
-    const disciplina = await this.disciplinaModel
-      .findById(id)
-      .populate('periodosLetivosID')
-      .lean();
-
-    if (!disciplina) {
-      throw new NotFoundException('Período letivo vinculado não encontrado.');
-    }
-
-    return disciplina;
-  }
+ async findProcesso(processoID: string): Promise<Disciplina[]> {
+  return await this.disciplinaModel.find({ processoID })
+}
 }

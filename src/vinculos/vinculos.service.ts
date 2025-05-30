@@ -16,72 +16,91 @@ export class VinculosService {
     @InjectModel(VinculoProfessor.name) private readonly vinculoProfessorModel: Model<VinculoProfessorDocument>,
   ) {}
 
-  async create(dto: CreateVinculoDto) {
-    const { email, matriculaIES, disciplinaID, turmaID } = dto;
-
-    if (!email && !matriculaIES) {
-        throw new BadRequestException('Forneça email ou matrícula');
+  async createMany(dtos: CreateVinculoDto[]): Promise<(VinculoAlunoDocument | VinculoProfessorDocument)[]> {
+    if (!Array.isArray(dtos) || dtos.length === 0) {
+      throw new BadRequestException('Array de vínculos vazio ou inválido');
     }
 
-    let usuario = matriculaIES 
+    const resultados: (VinculoAlunoDocument | VinculoProfessorDocument)[] = [];
+
+    for (const dto of dtos) {
+      const { email, matriculaIES, disciplinaID, turmaID } = dto;
+
+      if (!email && !matriculaIES) {
+        throw new BadRequestException('Forneça email ou matrícula');
+      }
+
+      let usuario = matriculaIES
         ? await this.usuarioModel.findOne({ matriculaIES })
         : null;
 
-    if (!usuario && email) {
+      if (!usuario && email) {
         usuario = await this.usuarioModel.findOne({ email });
-    }
+      }
 
-    if (!usuario) {
+      if (!usuario) {
         throw new NotFoundException('Usuário não encontrado');
-    }
+      }
 
-    if (!usuario.processoID) {
+      if (!usuario.processoID) {
         throw new BadRequestException('Usuário sem processo associado');
-    }
+      }
 
-    const disciplinaObjectId = new Types.ObjectId(disciplinaID);
-    const turmaObjectId = new Types.ObjectId(turmaID);
+      const disciplinaObjectId = new Types.ObjectId(disciplinaID);
+      const turmaObjectId = new Types.ObjectId(turmaID);
 
-    if (usuario.perfil === UsuariosPerfilEnum.ALUNO) {
+      if (usuario.perfil === UsuariosPerfilEnum.ALUNO) {
+    
         const vinculoExistente = await this.vinculoAlunoModel.findOne({
-            alunoID: usuario._id,
-            disciplinaID: disciplinaObjectId,
-            turmaID: turmaObjectId,
+          alunoID: usuario._id,
+          disciplinaID: disciplinaObjectId,
+          turmaID: turmaObjectId,
         });
 
         if (vinculoExistente) {
-            throw new ConflictException('Vínculo já existe');
+          throw new ConflictException('Vínculo já existe para o aluno');
         }
 
-        return await this.vinculoAlunoModel.create({
-            alunoID: usuario._id,
-            processoID: usuario.processoID,
-            disciplinaID: disciplinaObjectId,
-            turmaID: turmaObjectId,
+        const vinculo = await this.vinculoAlunoModel.create({
+          alunoID: usuario._id,
+          processoID: usuario.processoID,
+          disciplinaID: disciplinaObjectId,
+          turmaID: turmaObjectId,
         });
-    }
 
-    if (usuario.perfil === UsuariosPerfilEnum.PROFESSOR) {
+        resultados.push(vinculo);
+        continue;
+      }
+
+      if (usuario.perfil === UsuariosPerfilEnum.PROFESSOR) {
+      
         const vinculoExistente = await this.vinculoProfessorModel.findOne({
-            professorID: usuario._id,
-            disciplinaID: disciplinaObjectId,
-            turmaID: turmaObjectId,
+          professorID: usuario._id,
+          disciplinaID: disciplinaObjectId,
+          turmaID: turmaObjectId,
         });
 
         if (vinculoExistente) {
-            throw new ConflictException('Vínculo já existe');
+          throw new ConflictException('Vínculo já existe para o professor');
         }
 
-        return await this.vinculoProfessorModel.create({
-            professorID: usuario._id,
-            processoID: usuario.processoID,
-            disciplinaID: disciplinaObjectId,
-            turmaID: turmaObjectId,
+        const vinculo = await this.vinculoProfessorModel.create({
+          professorID: usuario._id,
+          processoID: usuario.processoID,
+          disciplinaID: disciplinaObjectId,
+          turmaID: turmaObjectId,
         });
+
+        resultados.push(vinculo);
+        continue;
+      }
+
+      throw new BadRequestException('Perfil inválido para usuário ' + usuario.nome);
     }
 
-    throw new BadRequestException('Perfil inválido');
-}
+    return resultados;
+  }
+
 
   async findAll() {
     const alunos = await this.vinculoAlunoModel.find();

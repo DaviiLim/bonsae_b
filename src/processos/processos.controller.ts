@@ -32,7 +32,7 @@ export class ProcessosController {
     return this.processosService.findById(id);
   }
 
-  @Patch('concluir/:id')
+  @Patch(':id/concluir')
   async concluir(@Param('id') id: string): Promise<Processo> {
     return this.processosService.concluirProcesso(id);
   }

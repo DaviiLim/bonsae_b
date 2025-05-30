@@ -1,11 +1,13 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Turma, TurmaDocument } from './schema/turmas.schema';
-import { CreateTurmaDto } from './dto/create-turma.dto';
+import { CreateTurmaArrayDto, CreateTurmaDto } from './dto/create-turma.dto';
 import { UpdateTurmaDto } from './dto/update-turma.dto';
 import { Processo, ProcessoDocument } from 'src/processos/schema/processos.schema';
 import { Disciplina, DisciplinaDocument } from 'src/disciplinas/schema/disciplinas.schema';
+import { plainToInstance } from 'class-transformer';
+import { validate } from 'class-validator';
 
 @Injectable()
 export class TurmasService {
@@ -17,25 +19,39 @@ export class TurmasService {
 
   ) {}
 
-  async create(dto: CreateTurmaDto): Promise<Turma> {
-    const existeTurma = await this.turmaModel.findOne({ codigoTurma: dto.codigoTurma });
-    if (existeTurma) {
-      throw new ConflictException('Já existe uma turma com esse código.');
-    }
+async createMany(dto: CreateTurmaArrayDto): Promise<Turma[]> {
+  const { turmas } = dto;
 
-    const disciplinaExiste = await this.disciplinaModel.findById(dto.disciplinaCodigo);
-    if (!disciplinaExiste) {
-      throw new NotFoundException('Disciplina informada não existe.');
-    }
+  const processoID = turmas[0].processoID;
+  const disciplinaCodigo = turmas[0].disciplinaCodigo;
 
-    const processoExiste = await this.processoModel.findById(dto.processoID);
-    if (!processoExiste) {
-      throw new NotFoundException('Processo informado não existe.');
-    }
-
-    const novaTurma = new this.turmaModel(dto);
-    return novaTurma.save();
+  const processoExiste = await this.processoModel.exists({ _id: processoID });
+  if (!processoExiste) {
+    throw new BadRequestException(`Processo ${processoID} não encontrado`);
   }
+
+  const disciplinaExiste = await this.disciplinaModel.exists({ _id: disciplinaCodigo });
+  if (!disciplinaExiste) {
+    throw new BadRequestException(`Disciplina ${disciplinaCodigo} não encontrada`);
+  }
+
+  const codigos = turmas.map((t) => t.codigo);
+  const codigosDuplicados = await this.turmaModel.find({
+    codigo: { $in: codigos },
+  });
+
+  if (codigosDuplicados.length > 0) {
+    const codigosExistentes = codigosDuplicados.map((t) => t.codigo).join(' | ');
+    throw new BadRequestException(`Os seguintes códigos de turma já existem: ${codigosExistentes}`);
+  }
+
+  const turmasParaInserir = turmas.map((t) => ({
+    ...t,
+    codigo: t.codigo,
+  }));
+
+  return await this.turmaModel.insertMany(turmasParaInserir, { ordered: true });
+}
 
   async findAll(): Promise<Turma[]> {
     const turmas = await this.turmaModel.find();

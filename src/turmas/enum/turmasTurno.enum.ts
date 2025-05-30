@@ -1,7 +1,7 @@
 export enum TurmasTurnoEnum{
 
   'MANHA' = 'MANHA',
-  'TARDE' = 'NOITE',
+  'TARDE' = 'TARDE',
   'NOITE' = 'NOITE'
 
 }

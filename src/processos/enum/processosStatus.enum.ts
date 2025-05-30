@@ -1,5 +1,5 @@
 export enum ProcessosStatusEnum {
-  'EM_ANDAMENTO' = 'em-andamento',
-   'CONCLUIDO' = 'concluido',
-    'ABORTADO' = 'abortado'
+  'EM_ANDAMENTO' = 'EM_ANDAMENTO',
+   'CONCLUIDO' = 'CONCLUIDO',
+    'ABORTADO' = 'ABORTADO'
 }
