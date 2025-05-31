@@ -41,7 +41,7 @@ export class TurmasController {
   @Get(':id/processos')
   @HttpCode(HttpStatus.OK)
   async getProcesso(@Param('id') id: string) {
-    return await this.turmasService.buscarProcesso(id);
+    return await this.turmasService.bsucarProcesso(id);
   }
 
   @Get(':id/disciplina')

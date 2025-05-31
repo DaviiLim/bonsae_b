@@ -3,11 +3,22 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Processo, ProcessoDocument } from './schema/processos.schema';
 import { PeriodosLetivos, PeriodosLetivosDocument } from '../periodos-letivos/schema/periodos-letivos.schema';
+import { Turma, TurmaDocument } from 'src/turmas/schema/turmas.schema';
+import { Disciplina, DisciplinaDocument } from 'src/disciplinas/schema/disciplinas.schema';
+import { VinculoAluno, VinculoAlunoDocument } from 'src/vinculos/schema/vinculo-aluno-turma.schema';
+import { VinculoProfessor, VinculoProfessorDocument } from 'src/vinculos/schema/vinculo-professor-turma.schema';
+import { Usuario } from 'src/usuarios/schema/usuarios.schema';
 
 @Injectable()
 export class ProcessosService {
   constructor(
     @InjectModel(Processo.name) private readonly processoModel: Model<ProcessoDocument>,
+    @InjectModel(Usuario.name) private readonly usuarioModel: Model<Usuario>,
+    @InjectModel(Turma.name) private readonly turmaModel: Model<TurmaDocument>,
+    @InjectModel(Disciplina.name) private readonly disciplinaModel: Model<DisciplinaDocument>,
+    @InjectModel(PeriodosLetivos.name) private readonly periodoLetivoModel: Model<PeriodosLetivosDocument>,
+    @InjectModel(VinculoAluno.name) private readonly vinculoAlunoModel: Model<VinculoAlunoDocument>,
+    @InjectModel(VinculoProfessor.name) private readonly vinculoProfessorModel: Model<VinculoProfessorDocument>
   ) {}
 
   async create(processoID: string): Promise<Processo> {
@@ -72,5 +83,33 @@ export class ProcessosService {
     return atualizado;
   }
 
-  
+    async buscarTudoById(processoID: string) {
+    const disciplinas = await this.disciplinaModel.find({ processoID });
+
+    const periodosLetivos = await this.periodoLetivoModel.find({ processoID });
+
+    const usuarios = await this.usuarioModel.find({ processoID });
+
+    const turmas = await this.turmaModel.find({ processoID });
+
+    const alunos = await this.vinculoAlunoModel.find({ processoID })
+      .populate('alunoID')
+      .populate('turmaID')
+      .populate('disciplinaID');
+
+    const professores = await this.vinculoProfessorModel.find({ processoID })
+      .populate('professorID')
+      .populate('turmaID')
+      .populate('disciplinaID');
+
+      return {
+      processoID,
+      disciplinas,
+      periodosLetivos,
+      usuarios,
+      turmas,
+      alunos,
+      professores
+    };
+  }  
 }

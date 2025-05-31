@@ -5,6 +5,7 @@ import { Usuario, UsuarioDocument } from './schema/usuarios.schema';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { Processo, ProcessoDocument } from 'src/processos/schema/processos.schema';
 import { CreateUsuariosArrayDto } from './dto/create-usuario.dto';
+import { PeriodosLetivos } from 'src/periodos-letivos/schema/periodos-letivos.schema';
 
 @Injectable()
 export class UsuariosService {
@@ -90,20 +91,7 @@ export class UsuariosService {
     return { message: 'Usuário excluído com sucesso.' };
   }
 
-  async buscarProcesso(id: string): Promise<Usuario> {
-    if (!Types.ObjectId.isValid(id)) {
-      throw new NotFoundException('ID inválido.');
+    async buscarProcesso(processoID: string): Promise<Usuario[]> {
+      return await this.usuarioModel.find({ processoID })
     }
-
-    const usuario = await this.usuarioModel
-      .findById(id)
-      .populate('processoID')
-      .lean();
-
-    if (!usuario) {
-      throw new NotFoundException('Processo vinculado não encontrado.');
-    }
-
-    return usuario;
-  }
 }

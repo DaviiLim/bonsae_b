@@ -42,4 +42,10 @@ export class ProcessosController {
   async delete(@Param('id') id: string): Promise<void> {
     await this.processosService.delete(id);
   }
+
+  @Get(':id/completo')
+  @HttpCode(HttpStatus.OK)
+  async buscarTudoPorProcesso(@Param('id') id: string) {
+    return this.processosService.buscarTudoById(id);
+  }
 }

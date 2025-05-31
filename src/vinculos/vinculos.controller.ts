@@ -1,16 +1,16 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus } from '@nestjs/common';
 import { VinculosService } from './vinculos.service';
-import { CreateVinculoDto } from './dto/create-vinculo.dto';
+import { CreateVinculoDto, CreateVinculosArrayDto } from './dto/create-vinculo.dto';
 import { UpdateVinculoDto } from './dto/update-vinculo.dto';
 
 @Controller('vinculos')
 export class VinculosController {
   constructor(private readonly vinculosService: VinculosService) {}
 
-  @Post()
+  @Post('')
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() dto: CreateVinculoDto[]) {
-    return await this.vinculosService.createMany(dto);
+  async createMany(@Body() dto: CreateVinculosArrayDto) {
+    return this.vinculosService.create(dto);
   }
 
   @Get()
@@ -37,9 +37,9 @@ export class VinculosController {
     await this.vinculosService.delete(id);
   }
 
-  @Get('processo/:id')
+  @Get(':id/processos')
   async buscarVinculoComProcesso(@Param('id') id: string) {
-  return this.vinculosService.buscarVinculoComProcesso(id);
+  return this.vinculosService.buscarProcesso(id);
 }
 
 

@@ -98,22 +98,9 @@ async createMany(dto: CreateTurmaArrayDto): Promise<Turma[]> {
     return { message: 'Turma excluída com sucesso.' };
   }
 
-  async buscarProcesso(id: string): Promise<Turma> {
-    if (!Types.ObjectId.isValid(id)) {
-      throw new NotFoundException('ID inválido.');
-    }
-
-    const turma = await this.turmaModel
-      .findById(id)
-      .populate('processoID')
-      .lean();
-
-    if (!turma) {
-      throw new NotFoundException('Processo vinculado não encontrado.');
-    }
-
-    return turma;
-  }
+  async bsucarProcesso(processoID: string): Promise<Turma[]> {
+  return await this.turmaModel.find({ processoID })
+}
 
   async buscarDisciplina(id: string): Promise<Turma> {
     if (!Types.ObjectId.isValid(id)) {

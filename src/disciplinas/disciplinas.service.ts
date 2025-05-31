@@ -92,7 +92,7 @@ export class DisciplinasService {
     return { message: 'Disciplina excluída com sucesso.' };
   }
 
- async findProcesso(processoID: string): Promise<Disciplina[]> {
-  return await this.disciplinaModel.find({ processoID })
-}
+  async buscarProcesso(processoID: string): Promise<Disciplina[]> {
+    return await this.disciplinaModel.find({ processoID })
+  }
 }

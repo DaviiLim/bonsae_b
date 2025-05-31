@@ -1,7 +1,7 @@
 import { ConflictException, Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { CreateVinculoDto } from './dto/create-vinculo.dto';
+import { CreateVinculoDto, CreateVinculosArrayDto } from './dto/create-vinculo.dto';
 import { UpdateVinculoDto } from './dto/update-vinculo.dto';
 import { Usuario } from 'src/usuarios/schema/usuarios.schema';
 import { VinculoAluno, VinculoAlunoDocument } from './schema/vinculo-aluno-turma.schema';
@@ -16,102 +16,108 @@ export class VinculosService {
     @InjectModel(VinculoProfessor.name) private readonly vinculoProfessorModel: Model<VinculoProfessorDocument>,
   ) {}
 
-  async createMany(dtos: CreateVinculoDto[]): Promise<(VinculoAlunoDocument | VinculoProfessorDocument)[]> {
-    if (!Array.isArray(dtos) || dtos.length === 0) {
-      throw new BadRequestException('Array de vínculos vazio ou inválido');
-    }
+  async create(dto: CreateVinculosArrayDto): Promise<(VinculoAlunoDocument | VinculoProfessorDocument)[]> {
+  const { usuarios } = dto;
 
-    const resultados: (VinculoAlunoDocument | VinculoProfessorDocument)[] = [];
-
-    for (const dto of dtos) {
-      const { email, matriculaIES, disciplinaID, turmaID } = dto;
-
-      if (!email && !matriculaIES) {
-        throw new BadRequestException('Forneça email ou matrícula');
-      }
-
-      let usuario = matriculaIES
-        ? await this.usuarioModel.findOne({ matriculaIES })
-        : null;
-
-      if (!usuario && email) {
-        usuario = await this.usuarioModel.findOne({ email });
-      }
-
-      if (!usuario) {
-        throw new NotFoundException('Usuário não encontrado');
-      }
-
-      if (!usuario.processoID) {
-        throw new BadRequestException('Usuário sem processo associado');
-      }
-
-      const disciplinaObjectId = new Types.ObjectId(disciplinaID);
-      const turmaObjectId = new Types.ObjectId(turmaID);
-
-      if (usuario.perfil === UsuariosPerfilEnum.ALUNO) {
-    
-        const vinculoExistente = await this.vinculoAlunoModel.findOne({
-          alunoID: usuario._id,
-          disciplinaID: disciplinaObjectId,
-          turmaID: turmaObjectId,
-        });
-
-        if (vinculoExistente) {
-          throw new ConflictException('Vínculo já existe para o aluno');
-        }
-
-        const vinculo = await this.vinculoAlunoModel.create({
-          alunoID: usuario._id,
-          processoID: usuario.processoID,
-          disciplinaID: disciplinaObjectId,
-          turmaID: turmaObjectId,
-        });
-
-        resultados.push(vinculo);
-        continue;
-      }
-
-      if (usuario.perfil === UsuariosPerfilEnum.PROFESSOR) {
-      
-        const vinculoExistente = await this.vinculoProfessorModel.findOne({
-          professorID: usuario._id,
-          disciplinaID: disciplinaObjectId,
-          turmaID: turmaObjectId,
-        });
-
-        if (vinculoExistente) {
-          throw new ConflictException('Vínculo já existe para o professor');
-        }
-
-        const vinculo = await this.vinculoProfessorModel.create({
-          professorID: usuario._id,
-          processoID: usuario.processoID,
-          disciplinaID: disciplinaObjectId,
-          turmaID: turmaObjectId,
-        });
-
-        resultados.push(vinculo);
-        continue;
-      }
-
-      throw new BadRequestException('Perfil inválido para usuário ' + usuario.nome);
-    }
-
-    return resultados;
+  if (!usuarios || usuarios.length === 0) {
+    throw new BadRequestException('Nenhum vínculo foi informado.');
   }
+
+  const resultados: (VinculoAlunoDocument | VinculoProfessorDocument)[] = [];
+
+  for (const userDto of usuarios) {
+    const { email, matriculaIES, disciplinaID, turmaID } = userDto;
+
+    if (!email && !matriculaIES) {
+      throw new BadRequestException('Informe pelo menos email ou matrículaIES.');
+    }
+
+    let usuario;
+
+    if (matriculaIES) {
+      usuario = await this.usuarioModel.findOne({ matriculaIES });
+    }
+
+    if (!usuario && email) {
+      usuario = await this.usuarioModel.findOne({ email });
+    }
+
+    if (!usuario) {
+      throw new NotFoundException(`Usuário com email ${email || ''} ou matrícula ${matriculaIES || ''} não encontrado.`);
+    }
+
+    if (!usuario.processoID) {
+      throw new BadRequestException(`Usuário ${usuario.nome} não possui processo associado.`);
+    }
+
+    const disciplinaObjectId = new Types.ObjectId(disciplinaID);
+    const turmaObjectId = new Types.ObjectId(turmaID);
+
+    if (usuario.perfil === UsuariosPerfilEnum.ALUNO) {
+      const vinculoExistente = await this.vinculoAlunoModel.findOne({
+        alunoID: usuario._id,
+        disciplinaID: disciplinaObjectId,
+        turmaID: turmaObjectId,
+      });
+
+      if (vinculoExistente) {
+        throw new ConflictException(`O aluno ${usuario.nome} já está vinculado à turma.`);
+      }
+
+      const vinculo = await this.vinculoAlunoModel.create({
+        alunoID: usuario._id,
+        processoID: usuario.processoID,
+        disciplinaID: disciplinaObjectId,
+        turmaID: turmaObjectId,
+      });
+
+      resultados.push(vinculo);
+    } else if (usuario.perfil === UsuariosPerfilEnum.PROFESSOR) {
+      const vinculoExistente = await this.vinculoProfessorModel.findOne({
+        professorID: usuario._id,
+        disciplinaID: disciplinaObjectId,
+        turmaID: turmaObjectId,
+      });
+
+      if (vinculoExistente) {
+        throw new ConflictException(`O professor ${usuario.nome} já está vinculado à turma.`);
+      }
+
+      const vinculo = await this.vinculoProfessorModel.create({
+        professorID: usuario._id,
+        processoID: usuario.processoID,
+        disciplinaID: disciplinaObjectId,
+        turmaID: turmaObjectId,
+      });
+
+      resultados.push(vinculo);
+    } else {
+      throw new BadRequestException(`Perfil inválido para o usuário ${usuario.nome}`);
+    }
+  }
+
+  return resultados;
+}
 
 
   async findAll() {
-    const alunos = await this.vinculoAlunoModel.find();
-    const professores = await this.vinculoProfessorModel.find();
+  const alunos = await this.vinculoAlunoModel
+    .find()
+    .populate('alunoID') 
+    .exec();
 
-    if (!alunos.length && !professores.length) {
-      throw new NotFoundException('Nenhum vínculo encontrado.');
-    }
+  const professores = await this.vinculoProfessorModel
+    .find()
+    .populate('professorID') 
+    .exec();
 
-    return { alunos, professores };
+  if (!alunos.length && !professores.length) {
+    throw new NotFoundException('Nenhum vínculo encontrado.');
   }
+
+  return { alunos, professores };
+}
+
 
   async findById(id: string) {
     if (!Types.ObjectId.isValid(id)) {
@@ -175,7 +181,7 @@ async update(id: string, dto: UpdateVinculoDto) {
     throw new NotFoundException('Vínculo não encontrado para exclusão.');
   }
 
-  async buscarVinculoComProcesso(id: string) {
+  async buscarProcesso(id: string) {
   if (!Types.ObjectId.isValid(id)) {
     throw new BadRequestException('ID inválido.');
   }

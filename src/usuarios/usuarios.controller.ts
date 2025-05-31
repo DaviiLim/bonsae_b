@@ -37,7 +37,7 @@ export class UsuariosController {
     await this.usuariosService.delete(id);
   }
 
-  @Get('processo/:id')
+  @Get(':id/processos')
   @HttpCode(HttpStatus.OK)
   async getProcesso(@Param('id') id: string) {
     return await this.usuariosService.buscarProcesso(id);
