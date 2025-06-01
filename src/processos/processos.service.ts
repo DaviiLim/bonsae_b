@@ -84,6 +84,11 @@ export class ProcessosService {
   }
 
     async buscarTudoById(processoID: string) {
+    
+    const processo = await this.processoModel.findById(processoID);
+    if (!processo) throw new NotFoundException('Processo não encontrado');
+
+
     const disciplinas = await this.disciplinaModel.find({ processoID });
 
     const periodosLetivos = await this.periodoLetivoModel.find({ processoID });
@@ -111,5 +116,30 @@ export class ProcessosService {
       alunos,
       professores
     };
-  }  
+  }
+
+  async rollbackProcesso(processoID: string): Promise<string> {
+  if (!Types.ObjectId.isValid(processoID)) {
+    throw new NotFoundException('processoID inválido');
+  }
+
+  const processo = await this.processoModel.findById(processoID);
+  if (!processo) {
+    throw new NotFoundException('Processo não encontrado');
+  }
+
+  await Promise.all([
+    this.vinculoAlunoModel.deleteMany({ processoID }),
+    this.vinculoProfessorModel.deleteMany({ processoID }),
+    this.usuarioModel.deleteMany({ processoID }),
+    this.turmaModel.deleteMany({ processoID }),
+    this.disciplinaModel.deleteMany({ processoID }),
+    this.periodoLetivoModel.deleteMany({ processoID }),
+  ]);
+
+  await this.processoModel.findByIdAndDelete(processoID);
+
+  return 'Rollback realizado com sucesso. Todos os dados relacionados ao processo foram removidos.';
+}
+
 }

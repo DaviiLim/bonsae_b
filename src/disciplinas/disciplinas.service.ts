@@ -2,14 +2,11 @@ import { BadRequestException, ConflictException, Injectable, InternalServerError
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Disciplina, DisciplinaDocument } from './schema/disciplinas.schema';
-import { CreateDisciplinaDto, CreateDisciplinasArrayDto } from './dto/create-disciplina.dto';
+import { CreateDisciplinasArrayDto } from './dto/create-disciplina.dto';
 import { UpdateDisciplinaDto } from './dto/update-disciplina.dto';
 import { Processo, ProcessoDocument } from 'src/processos/schema/processos.schema';
 import { PeriodosLetivos, PeriodosLetivosDocument } from 'src/periodos-letivos/schema/periodos-letivos.schema';
-import { DisciplinasCategoriaEnum } from './enum/disciplinasCategoria.enum';
-import { DisciplinasEstadoEnum } from './enum/disciplinasEstado.enum';
-import { plainToInstance } from 'class-transformer';
-import { validate } from 'class-validator';
+
 
 function validarObjectId(id: string, nomeCampo = 'ID'): void {
   if (!Types.ObjectId.isValid(id)) {

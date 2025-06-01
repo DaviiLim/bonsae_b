@@ -48,4 +48,11 @@ export class ProcessosController {
   async buscarTudoPorProcesso(@Param('id') id: string) {
     return this.processosService.buscarTudoById(id);
   }
+
+  @Post(':id/rollback')
+  @HttpCode(HttpStatus.OK)
+  async rollback(@Param('id') id: string): Promise<{ message: string }> {
+    const message = await this.processosService.rollbackProcesso(id);
+    return { message };
+  }
 }
