@@ -7,20 +7,30 @@ import { DisciplinasModule } from './disciplinas/disciplinas.module';
 import { ProcessosModule } from './processos/processos.module';
 import { TurmasModule } from './turmas/turmas.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { VinculosModule } from './vinculos/vinculos.module';
 
 @Module({
   imports: [
+    // MongooseModule.forRoot('mongodb://localhost:27017/bonsae_db'),
 
-    // MongoDB
-    MongooseModule.forRoot('mongodb://localhost:27017/bonsae_db'),
-    
-    PeriodosLetivosModule,
-    DisciplinasModule,
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: 'localhost',
+      port: 5432,
+      username: 'postgres',
+      password: '2010',
+      database: 'bonsae',
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      synchronize: true,
+    }),
+
+    // PeriodosLetivosModule,
+    // DisciplinasModule,
     ProcessosModule,
-    TurmasModule,
-    UsuariosModule,
-    VinculosModule,
+    // TurmasModule,
+    // UsuariosModule,
+    // VinculosModule,
   ],
   controllers: [AppController],
   providers: [AppService],

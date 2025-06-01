@@ -1,24 +1,16 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
-import { ProcessosStatusEnum } from '../enum/processosStatus.enum';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('processos')
+@Entity()
 export class Processo {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  processoID: number;
 
-  @Column({ unique: true })
-  processoID: string;
+  @Column()
+  status: string;
 
-  @Column({
-    type: 'enum',
-    enum: ProcessosStatusEnum,
-    default: ProcessosStatusEnum.EM_ANDAMENTO,
-  })
-  status: ProcessosStatusEnum;
-
-  @CreateDateColumn({ name: 'data_inicio' })
+  @Column()
   dataInicio: Date;
 
-  @Column({ type: 'timestamp', nullable: true, name: 'data_fim' })
-  dataFim?: Date;
+  @Column()
+  dataFim: Date;
 }
