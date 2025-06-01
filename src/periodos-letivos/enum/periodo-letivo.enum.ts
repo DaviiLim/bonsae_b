@@ -1,0 +1,10 @@
+export enum PeriodoLetivoEnum{
+
+  SEMESTRE_1 = 'SEMESTRE-1',
+  SEMESTRE_2 = 'SEMESTRE-2',
+  BIMESTRE_1_1 = 'BIMESTRE-1-1',
+  BIMESTRE_1_2 = 'BIMESTRE-1-2',
+  BIMESTRE_2_1 = 'BIMESTRE-2-1',
+  BIMESTRE_2_2 = 'BIMESTRE-2-2',
+
+}
