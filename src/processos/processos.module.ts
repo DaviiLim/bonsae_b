@@ -1,4 +1,3 @@
-// src/processos/processos.module.ts
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ProcessosController } from './processos.controller';
@@ -10,6 +9,9 @@ import { VinculoAluno, VinculoAlunoSchema } from 'src/vinculos/schema/vinculo-al
 import { VinculoProfessor, VinculoProfessorSchema } from 'src/vinculos/schema/vinculo-professor-turma.schema';
 import { Usuario, UsuarioSchema } from 'src/usuarios/schema/usuarios.schema';
 import { Turma, TurmaSchema } from 'src/turmas/schema/turmas.schema';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Processo as ProcessoSQL } from './entities/processo.entity';
+import { PeriodosLetivos as PeriodosLetivosSQL } from '../periodos-letivos/entities/periodos-letivo.entity';
 
 @Module({
   imports: [
@@ -23,7 +25,10 @@ import { Turma, TurmaSchema } from 'src/turmas/schema/turmas.schema';
       {name: VinculoAluno.name, schema: VinculoAlunoSchema},
       {name: VinculoProfessor.name, schema: VinculoProfessorSchema}
       
-    ])],
+    ]),
+  
+  TypeOrmModule.forFeature([ProcessoSQL,PeriodosLetivosSQL]),
+],
   controllers: [ProcessosController],
   providers: [ProcessosService],
 })

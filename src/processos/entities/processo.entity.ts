@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToOne } from 'typeorm';
 import { ProcessosStatusEnum } from '../enum/processosStatus.enum';
+import { PeriodosLetivos as PeriodosLetivosSQl } from 'src/periodos-letivos/entities/periodos-letivo.entity';
 
 @Entity('processos')
 export class Processo {
@@ -7,7 +8,7 @@ export class Processo {
   id: string;
 
   @Column({ unique: true })
-  processoID: string;
+  identificacao: string;
 
   @Column({
     type: 'enum',
@@ -21,4 +22,7 @@ export class Processo {
 
   @Column({ type: 'timestamp', nullable: true, name: 'data_fim' })
   dataFim?: Date;
+
+  @OneToOne(() => PeriodosLetivosSQl, periodo => periodo.processo)
+  periodoLetivo: PeriodosLetivosSQl;
 }

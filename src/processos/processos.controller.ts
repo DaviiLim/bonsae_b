@@ -1,16 +1,8 @@
-import {
-  Controller,
-  Post,
-  Get,
-  Param,
-  Patch,
-  Delete,
-  Body,
-  HttpCode,
-  HttpStatus,
-} from '@nestjs/common';
+import { Controller, Post, Get, Param, Delete, Body, HttpCode, HttpStatus} from '@nestjs/common';
 import { ProcessosService } from './processos.service';
 import { Processo } from './schema/processos.schema';
+import { CreateProcessoDto } from './dto/create-processo.dto';
+import { Processo as ProcessoSQL } from './entities/processo.entity';
 
 @Controller('processos')
 export class ProcessosController {
@@ -18,8 +10,8 @@ export class ProcessosController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body('processoID') processoID: string): Promise<Processo> {
-    return this.processosService.create(processoID);
+  async create(@Body() dto: CreateProcessoDto): Promise<Processo> {
+    return this.processosService.create(dto);
   }
 
   @Get()
@@ -32,10 +24,15 @@ export class ProcessosController {
     return this.processosService.findById(id);
   }
 
-  @Patch(':id/concluir')
+  @Post(':id/concluir')
   async concluir(@Param('id') id: string): Promise<Processo> {
     return this.processosService.concluirProcesso(id);
   }
+
+  @Post(':id/abortar')
+  async cacnelar(@Param('id') id: string): Promise<Processo> {
+    return this.processosService.abortarProcessoNome(id);
+  }  
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -43,16 +40,23 @@ export class ProcessosController {
     await this.processosService.delete(id);
   }
 
-  @Get(':id/completo')
+  @Post(':id/full')
   @HttpCode(HttpStatus.OK)
   async buscarTudoPorProcesso(@Param('id') id: string) {
     return this.processosService.buscarTudoById(id);
   }
+  
 
-  @Post(':id/rollback')
+  @Post(':id/migrar') // não usar 
   @HttpCode(HttpStatus.OK)
   async rollback(@Param('id') id: string): Promise<{ message: string }> {
-    const message = await this.processosService.rollbackProcesso(id);
-    return { message };
+    await this.processosService.migrarProcesso(id);
+    return { message: 'Migração realizada com sucesso! parabéns!!' };
+  }
+
+    @Get('completo')              
+  @HttpCode(HttpStatus.OK)
+  async getAllWithPeriodos(): Promise<ProcessoSQL[]> {
+    return this.processosService.findAllWithPeriodos();
   }
 }

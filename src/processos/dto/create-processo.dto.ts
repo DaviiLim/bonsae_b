@@ -4,7 +4,7 @@ import { ProcessosStatusEnum } from '../enum/processosStatus.enum';
 export class CreateProcessoDto {
   @IsString()
   @IsNotEmpty()
-  processoID: string; 
+  identificacao: string; 
   
   @IsDateString()
   @IsOptional()

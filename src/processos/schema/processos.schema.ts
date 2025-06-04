@@ -7,7 +7,7 @@ export type ProcessoDocument = Processo & Document;
 @Schema({collection: 'processos' })
 export class Processo {
   @Prop({ required: true, unique: true })
-  processoID: string; 
+  identificacao: string; 
 
   @Prop({
     type: String,

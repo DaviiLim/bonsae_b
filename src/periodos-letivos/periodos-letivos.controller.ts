@@ -37,9 +37,11 @@ export class PeriodosLetivosController {
     await this.periodosLetivosService.delete(id);
   }
 
-  @Get('processos/:id/periodo-letivos')
+  @Get('processos/:id')
   @HttpCode(HttpStatus.OK)
   async buscarProcesso(@Param('id') id: string) {
     return await this.periodosLetivosService.buscarProcesso(id);
   }
+
+  
 }

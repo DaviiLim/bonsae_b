@@ -8,6 +8,12 @@ import { Disciplina, DisciplinaDocument } from 'src/disciplinas/schema/disciplin
 import { VinculoAluno, VinculoAlunoDocument } from 'src/vinculos/schema/vinculo-aluno-turma.schema';
 import { VinculoProfessor, VinculoProfessorDocument } from 'src/vinculos/schema/vinculo-professor-turma.schema';
 import { Usuario } from 'src/usuarios/schema/usuarios.schema';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Processo as ProcessoSQL } from './entities/processo.entity';
+import { PeriodosLetivos as PeriodosLetivosSQL } from '../periodos-letivos/entities/periodos-letivo.entity';
+import { DataSource, Repository } from 'typeorm';
+import { ProcessosStatusEnum } from './enum/processosStatus.enum';
+import { CreateProcessoDto } from './dto/create-processo.dto';
 
 @Injectable()
 export class ProcessosService {
@@ -18,28 +24,39 @@ export class ProcessosService {
     @InjectModel(Disciplina.name) private readonly disciplinaModel: Model<DisciplinaDocument>,
     @InjectModel(PeriodosLetivos.name) private readonly periodoLetivoModel: Model<PeriodosLetivosDocument>,
     @InjectModel(VinculoAluno.name) private readonly vinculoAlunoModel: Model<VinculoAlunoDocument>,
-    @InjectModel(VinculoProfessor.name) private readonly vinculoProfessorModel: Model<VinculoProfessorDocument>
+    @InjectModel(VinculoProfessor.name) private readonly vinculoProfessorModel: Model<VinculoProfessorDocument>,
+
+    @InjectRepository(ProcessoSQL) private readonly processoRepository: Repository<ProcessoSQL>,
+    private readonly dataSource: DataSource,
   ) {}
 
-  async create(processoID: string): Promise<Processo> {
+  async create(dto: CreateProcessoDto): Promise<Processo> {
+    const { identificacao } = dto;
 
-  const jaExiste = await this.processoModel.findOne({ processoID });
-  if (jaExiste) {
-    throw new ConflictException('Já existe um processo com esse processoID.');
+    const jaExiste = await this.processoModel.findOne({ identificacao });
+    if (jaExiste) {
+      throw new ConflictException('Já existe um processo com essa identificação.');
+    }
+
+    const novo = new this.processoModel(dto);
+
+    try {
+      return await novo.save();
+    } catch (err) {
+      throw new NotFoundException('Falha ao salvar o processo.');
+    }
   }
 
-  const novo = new this.processoModel({ processoID });
-
-  try {
-    return await novo.save();
-  } catch (err) {
-    throw new NotFoundException('Falha ao salvar o processo.');
-  }
-}
 
 
   async find(): Promise<Processo[]> {
-    return this.processoModel.find();
+    const processos = await this.processoModel.find()
+
+    if (!processos.length){
+      throw new NotFoundException('Nenhum processo foi encontrado!')
+    }
+
+    return processos
   }
 
   async findById(_id: string): Promise<Processo> {
@@ -74,6 +91,23 @@ export class ProcessosService {
     const atualizado = await this.processoModel.findByIdAndUpdate(
       _id,
       { status: 'CONCLUIDO', dataFim: new Date() },
+      { new: true },
+    );
+    if (!atualizado) {
+      throw new NotFoundException('Falha ao atualizar o processo');
+    }
+
+    return atualizado;
+  }
+
+  async abortarProcessoNome(_id: string): Promise<Processo> {
+    const existeProcesso = await this.processoModel.findById(_id);
+    if (!existeProcesso) {
+      throw new NotFoundException('Processo não encontrado');
+    }
+    const atualizado = await this.processoModel.findByIdAndUpdate(
+      _id,
+      { status: 'ABORTADO', dataFim: new Date() },
       { new: true },
     );
     if (!atualizado) {
@@ -139,7 +173,79 @@ export class ProcessosService {
 
   await this.processoModel.findByIdAndDelete(processoID);
 
-  return 'Rollback realizado com sucesso. Todos os dados relacionados ao processo foram removidos.';
+  return 'Dados deletados com sucesso. Todos os dados relacionados ao processo foram removidos.';
 }
+
+async migrarProcesso(id: string): Promise<ProcessoSQL> {
+  if (!Types.ObjectId.isValid(id)) {
+    throw new NotFoundException('ID inválido.');
+  }
+
+  const processoMongo = await this.processoModel.findById(id);
+  if (!processoMongo) {
+    throw new NotFoundException('Processo não encontrado.');
+  }
+
+  const exists = await this.processoRepository.findOne({
+    where: { identificacao: processoMongo.identificacao },
+  });
+
+  if (exists) {
+    throw new ConflictException('Já existe um processo com essa identificação');
+  }
+
+  const periodoMongo = await this.periodoLetivoModel.findOne({ processoID: id });
+  if (!periodoMongo) {
+    throw new NotFoundException('Período Letivo não encontrado para o processo.');
+  }
+
+  const queryRunner = this.dataSource.createQueryRunner();
+  await queryRunner.connect();
+  await queryRunner.startTransaction();
+
+  try {
+    const processoSQL = queryRunner.manager.create(ProcessoSQL, {
+      identificacao: processoMongo.identificacao,
+      status: processoMongo.status as ProcessosStatusEnum,
+      dataInicio: processoMongo.dataInicio,
+      dataFim: processoMongo.dataFim,
+    });
+
+    const processoSalvo = await queryRunner.manager.save(processoSQL);
+
+    const periodoSQL = queryRunner.manager.create(PeriodosLetivosSQL, {
+      identificacao: periodoMongo.identificacao,
+      periodoLetivo: periodoMongo.periodoLetivo,
+      dataInicial: periodoMongo.dataInicial,
+      dataFim: periodoMongo.dataFim,
+      processo: processoSalvo,
+    });
+
+    await queryRunner.manager.save(periodoSQL);
+
+    await queryRunner.commitTransaction();
+
+    await this.concluirProcesso(id);
+
+    return processoSalvo;
+
+  } catch (error) {
+    await queryRunner.rollbackTransaction();
+    await this.processoModel.findByIdAndUpdate(id, {
+    status: 'ANDAMENTO',
+    dataFim: null,
+    });
+
+    throw error;
+  } finally {
+    await queryRunner.release();
+  }
+}
+
+  async findAllWithPeriodos(): Promise<ProcessoSQL[]> {
+    return this.processoRepository.find({
+      relations: ['periodos'],     
+    });
+  }
 
 }

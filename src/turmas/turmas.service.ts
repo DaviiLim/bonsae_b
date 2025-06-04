@@ -1,13 +1,11 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException,Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Turma, TurmaDocument } from './schema/turmas.schema';
-import { CreateTurmaArrayDto, CreateTurmaDto } from './dto/create-turma.dto';
+import { CreateTurmaArrayDto } from './dto/create-turma.dto';
 import { UpdateTurmaDto } from './dto/update-turma.dto';
 import { Processo, ProcessoDocument } from 'src/processos/schema/processos.schema';
 import { Disciplina, DisciplinaDocument } from 'src/disciplinas/schema/disciplinas.schema';
-import { plainToInstance } from 'class-transformer';
-import { validate } from 'class-validator';
 
 @Injectable()
 export class TurmasService {
