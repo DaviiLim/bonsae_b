@@ -10,7 +10,6 @@ import { Disciplina, DisciplinaDocument } from 'src/disciplinas/schema/disciplin
 @Injectable()
 export class TurmasService {
   constructor(
-    
     @InjectModel(Turma.name) private readonly turmaModel: Model<TurmaDocument>,
     @InjectModel(Processo.name) private readonly processoModel: Model<ProcessoDocument>,
     @InjectModel(Disciplina.name) private readonly disciplinaModel: Model<DisciplinaDocument>
@@ -96,7 +95,7 @@ async createMany(dto: CreateTurmaArrayDto): Promise<Turma[]> {
     return { message: 'Turma excluída com sucesso.' };
   }
 
-  async bsucarProcesso(processoID: string): Promise<Turma[]> {
+  async buscarProcesso(processoID: string): Promise<Turma[]> {
   return await this.turmaModel.find({ processoID })
 }
 

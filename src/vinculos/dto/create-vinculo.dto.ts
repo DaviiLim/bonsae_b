@@ -20,8 +20,12 @@ export class CreateVinculoDto {
 }
 
 export class CreateVinculosArrayDto {
+  @IsNotEmpty()
+  @IsString()
+  processoID: string;
+  
   @ValidateNested({ each: true })
   @Type(() => CreateVinculoDto)
   @ArrayMinSize(1)
-  usuarios: CreateVinculoDto[];
+  vinculos: CreateVinculoDto[];
 }
