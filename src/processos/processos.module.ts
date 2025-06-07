@@ -10,7 +10,6 @@ import { VinculoProfessor, VinculoProfessorSchema } from 'src/vinculos/schema/vi
 import { Usuario, UsuarioSchema } from 'src/usuarios/schema/usuarios.schema';
 import { Turma, TurmaSchema } from 'src/turmas/schema/turmas.schema';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PeriodosLetivos as PeriodosLetivosSQL } from '../periodos-letivos/entities/periodos-letivo.entity';
 
 @Module({
   imports: [
@@ -26,7 +25,7 @@ import { PeriodosLetivos as PeriodosLetivosSQL } from '../periodos-letivos/entit
       
     ]),
   
-  TypeOrmModule.forFeature([PeriodosLetivosSQL]),
+  TypeOrmModule.forFeature([]),
 ],
   controllers: [ProcessosController],
   providers: [ProcessosService],

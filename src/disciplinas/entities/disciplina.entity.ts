@@ -7,7 +7,6 @@ import {
   ManyToOne,
   JoinColumn
 } from 'typeorm';
-import { PeriodoLetivo } from '../../periodos-letivos/entities/periodos-letivo.entity';
 import { DisciplinasEstadoEnum } from '../enum/disciplinasEstado.enum';
 import { DisciplinasCategoriaEnum } from '../enum/disciplinasCategoria.enum';
 
@@ -16,9 +15,6 @@ export class Disciplina {
   @PrimaryGeneratedColumn({ unsigned: true, type: 'bigint' })
   id: number;
 
-  @ManyToOne(() => PeriodoLetivo)
-  @JoinColumn({ name: 'periodo_letivo_id' })
-  periodoLetivo: PeriodoLetivo;
 
   @Column({ name: 'processo_id', type: 'int' })
   processoId: number;

@@ -5,7 +5,6 @@ import { PeriodosLetivos, PeriodosLetivosSchema } from './schema/periodos-letivo
 import { PeriodosLetivosService } from './periodos-letivos.service';
 import { Processo, ProcessoSchema } from 'src/processos/schema/processos.schema';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PeriodosLetivos as PeriodosLetivosSQL } from './entities/periodos-letivo.entity';
 
 @Module({
   imports: [
@@ -13,7 +12,7 @@ import { PeriodosLetivos as PeriodosLetivosSQL } from './entities/periodos-letiv
       { name: PeriodosLetivos.name, schema: PeriodosLetivosSchema },
       { name: Processo.name, schema: ProcessoSchema },
     ]),
-    TypeOrmModule.forFeature([PeriodosLetivosSQL])
+    TypeOrmModule.forFeature([])
   ],
   providers: [PeriodosLetivosService],
   controllers: [PeriodosLetivosController],

@@ -8,7 +8,6 @@ import { Disciplina, DisciplinaDocument } from 'src/disciplinas/schema/disciplin
 import { VinculoAluno, VinculoAlunoDocument } from 'src/vinculos/schema/vinculo-aluno-turma.schema';
 import { VinculoProfessor, VinculoProfessorDocument } from 'src/vinculos/schema/vinculo-professor-turma.schema';
 import { Usuario } from 'src/usuarios/schema/usuarios.schema';
-import { PeriodosLetivos as PeriodosLetivosSQL } from '../periodos-letivos/entities/periodos-letivo.entity';
 import { DataSource } from 'typeorm';
 import { CreateProcessoDto } from './dto/create-processo.dto';
 
@@ -158,45 +157,6 @@ async migrarProcesso(id: string) {
     throw new NotFoundException('ID inválido.');
   }
 
-  const processoMongo = await this.processoModel.findById(id);
-  if (!processoMongo) {
-    throw new NotFoundException('Processo não encontrado.');
-  }
-
-  const periodoMongo = await this.periodoLetivoModel.findOne({ processoID: id });
-  if (!periodoMongo) {
-    throw new NotFoundException('Período Letivo não encontrado para o processo.');
-  }
-
-  const queryRunner = this.dataSource.createQueryRunner();
-  await queryRunner.connect();
-  await queryRunner.startTransaction();
-
-  try {
-
-    const periodoSQL = queryRunner.manager.create(PeriodosLetivosSQL, {
-      identificacao: periodoMongo.identificacao,
-      periodoLetivo: periodoMongo.periodoLetivo,
-      dataInicial: periodoMongo.dataInicial,
-      dataFim: periodoMongo.dataFim,
-    });
-
-    await queryRunner.manager.save(periodoSQL);
-
-    await queryRunner.commitTransaction();
-
-    await this.concluirProcesso(id);
-
-    return await this.buscarTudoById(id);
-
-  } catch (error) {
-    await queryRunner.rollbackTransaction();
-    await this.abortarProcesso(id)
-
-    throw error;
-  } finally {
-    await queryRunner.release();
-  }
 }
 
 
