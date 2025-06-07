@@ -99,20 +99,5 @@ async createMany(dto: CreateTurmaArrayDto): Promise<Turma[]> {
   return await this.turmaModel.find({ processoID })
 }
 
-  async buscarDisciplina(id: string): Promise<Turma> {
-    if (!Types.ObjectId.isValid(id)) {
-      throw new NotFoundException('ID inválido.');
-    }
-
-    const turma = await this.turmaModel
-      .findById(id)
-      .populate('disciplinaCodigo')
-      .lean();
-
-    if (!turma) {
-      throw new NotFoundException('Disciplina vinculada não encontrada.');
-    }
-
-    return turma;
-  }
+  
 }

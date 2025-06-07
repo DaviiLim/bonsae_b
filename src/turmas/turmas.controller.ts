@@ -7,7 +7,7 @@ import { UpdateTurmaDto } from './dto/update-turma.dto';
 export class TurmasController {
   constructor(private readonly turmasService: TurmasService) {}
 
-  @Post('')
+  @Post()
   @HttpCode(HttpStatus.CREATED)
   async createMany(@Body() dto: CreateTurmaArrayDto) {
   return this.turmasService.createMany(dto);
@@ -38,15 +38,10 @@ export class TurmasController {
     await this.turmasService.delete(id);
   }
 
-  @Get(':id/processos')
+  @Get('processos/:id')
   @HttpCode(HttpStatus.OK)
-  async getProcesso(@Param('id') id: string) {
+  async buscarProcesso(@Param('id') id: string) {
     return await this.turmasService.buscarProcesso(id);
   }
 
-  @Get(':id/disciplina')
-  @HttpCode(HttpStatus.OK)
-  async getDisciplina(@Param('id') id: string) {
-    return await this.turmasService.buscarDisciplina(id);
-  }
 }

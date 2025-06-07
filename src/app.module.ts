@@ -40,7 +40,6 @@
         inject: [ConfigService],
       }),
 
-      // Módulos da aplicação
       PeriodosLetivosModule,
       DisciplinasModule,
       ProcessosModule,

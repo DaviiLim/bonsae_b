@@ -130,13 +130,11 @@ import { Disciplina, DisciplinaDocument } from 'src/disciplinas/schema/disciplin
     async findAll() {
     const alunos = await this.vinculoAlunoModel
       .find()
-      .populate('alunoID') 
-      .exec();
+  
 
     const professores = await this.vinculoProfessorModel
       .find()
-      .populate('professorID') 
-      .exec();
+  
 
     if (!alunos.length && !professores.length) {
       throw new NotFoundException('Nenhum vínculo encontrado.');
@@ -208,31 +206,23 @@ import { Disciplina, DisciplinaDocument } from 'src/disciplinas/schema/disciplin
       throw new NotFoundException('Vínculo não encontrado para exclusão.');
     }
 
-    async buscarProcesso(id: string) {
-    if (!Types.ObjectId.isValid(id)) {
-      throw new BadRequestException('ID inválido.');
+    async buscarProcessoAluno(processoID: string): Promise<VinculoAluno[]> {
+      const processoExiste = await this.vinculoAlunoModel.find({processoID})
+      if (!processoExiste){
+        throw new BadRequestException('Processo não encontrado / não existe !')
+      }
+
+      return processoExiste;
     }
 
-    const vinculoAluno = await this.vinculoAlunoModel
-      .findById(id)
-      .populate('processoID')
-      .lean();
+    async buscarProcessoProfessor(processoID: string): Promise<VinculoProfessor[]> {
+      const processoExiste = await this.vinculoProfessorModel.find({processoID})
+      if (!processoExiste){
+        throw new BadRequestException('Processo não encontrado / não existe !')
+      }
 
-    if (vinculoAluno) {
-      return vinculoAluno;
+      return processoExiste;
     }
-
-    const vinculoProfessor = await this.vinculoProfessorModel
-      .findById(id)
-      .populate('processoID')
-      .lean();
-
-    if (vinculoProfessor) {
-      return vinculoProfessor;
-    }
-
-    throw new NotFoundException('Vínculo não encontrado.');
-  }
 
     
   }

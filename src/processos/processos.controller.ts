@@ -30,7 +30,7 @@ export class ProcessosController {
   }
 
   @Post(':id/abortar')
-  async cacnelar(@Param('id') id: string): Promise<Processo> {
+  async cancelar(@Param('id') id: string): Promise<Processo> {
     return this.processosService.abortarProcessoNome(id);
   }  
 

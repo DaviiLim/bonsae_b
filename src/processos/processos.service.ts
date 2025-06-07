@@ -131,15 +131,9 @@ export class ProcessosService {
 
     const turmas = await this.turmaModel.find({ processoID });
 
-    const alunos = await this.vinculoAlunoModel.find({ processoID })
-      .populate('alunoID')
-      .populate('turmaID')
-      .populate('disciplinaID');
+    const alunos = await this.vinculoAlunoModel.find({ processoID });
 
-    const professores = await this.vinculoProfessorModel.find({ processoID })
-      .populate('professorID')
-      .populate('turmaID')
-      .populate('disciplinaID');
+    const professores = await this.vinculoProfessorModel.find({ processoID });
 
       return {
       processoID,
@@ -152,7 +146,7 @@ export class ProcessosService {
     };
   }
 
-  async rollbackProcesso(processoID: string): Promise<string> {
+  async apagarTudo(processoID: string): Promise<string> {
   if (!Types.ObjectId.isValid(processoID)) {
     throw new NotFoundException('processoID inválido');
   }
@@ -184,14 +178,6 @@ async migrarProcesso(id: string): Promise<ProcessoSQL> {
   const processoMongo = await this.processoModel.findById(id);
   if (!processoMongo) {
     throw new NotFoundException('Processo não encontrado.');
-  }
-
-  const exists = await this.processoRepository.findOne({
-    where: { identificacao: processoMongo.identificacao },
-  });
-
-  if (exists) {
-    throw new ConflictException('Já existe um processo com essa identificação');
   }
 
   const periodoMongo = await this.periodoLetivoModel.findOne({ processoID: id });

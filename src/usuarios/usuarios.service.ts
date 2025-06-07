@@ -92,6 +92,11 @@ export class UsuariosService {
   }
 
     async buscarProcesso(processoID: string): Promise<Usuario[]> {
-      return await this.usuarioModel.find({ processoID })
+      const processoExiste = await this.usuarioModel.find({processoID})
+      if (!processoExiste){
+        throw new BadRequestException('Processo não encontrado / não existe !')
+      }
+
+      return processoExiste;
     }
 }
