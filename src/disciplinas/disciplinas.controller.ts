@@ -37,7 +37,7 @@ export class DisciplinasController {
     await this.disciplinasService.delete(id);
   }
 
-@Get(':id/processos')
+@Get('processos/:id')
 @HttpCode(HttpStatus.OK)
 async findProcesso(@Param('id') id: string) {
   return this.disciplinasService.buscarProcesso(id);

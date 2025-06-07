@@ -125,16 +125,12 @@ import { Disciplina, DisciplinaDocument } from 'src/disciplinas/schema/disciplin
   return resultados;
   }
 
-
-
     async findAll() {
     const alunos = await this.vinculoAlunoModel
       .find()
-  
 
     const professores = await this.vinculoProfessorModel
       .find()
-  
 
     if (!alunos.length && !professores.length) {
       throw new NotFoundException('Nenhum vínculo encontrado.');
@@ -224,5 +220,19 @@ import { Disciplina, DisciplinaDocument } from 'src/disciplinas/schema/disciplin
       return processoExiste;
     }
 
+  async buscarProcesso(processoID: string) {
+  const [alunos, professores] = await Promise.all([
+    this.vinculoAlunoModel.find({ processoID: processoID }).exec(), // Note processoID aqui
+    this.vinculoProfessorModel.find({ processoID: processoID }).exec() // E aqui
+  ]);
+
+  const resultado = [...alunos, ...professores];
+
+  if (resultado.length === 0) {
+    throw new NotFoundException(`Nenhum vínculo encontrado para o processo ${processoID}.`);
+  }
+
+  return resultado;
+}
     
   }

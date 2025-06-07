@@ -2,7 +2,6 @@ import { Controller, Post, Get, Param, Delete, Body, HttpCode, HttpStatus} from 
 import { ProcessosService } from './processos.service';
 import { Processo } from './schema/processos.schema';
 import { CreateProcessoDto } from './dto/create-processo.dto';
-import { Processo as ProcessoSQL } from './entities/processo.entity';
 
 @Controller('processos')
 export class ProcessosController {
@@ -31,32 +30,27 @@ export class ProcessosController {
 
   @Post(':id/abortar')
   async cancelar(@Param('id') id: string): Promise<Processo> {
-    return this.processosService.abortarProcessoNome(id);
+    return this.processosService.abortarProcesso(id);
   }  
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async delete(@Param('id') id: string): Promise<void> {
-    await this.processosService.delete(id);
+    await this.processosService.apagarTudo(id);
   }
 
-  @Post(':id/full')
+  @Get(':id/full')
   @HttpCode(HttpStatus.OK)
   async buscarTudoPorProcesso(@Param('id') id: string) {
     return this.processosService.buscarTudoById(id);
   }
   
 
-  @Post(':id/migrar') // não usar 
+  @Post(':id/migrar') 
   @HttpCode(HttpStatus.OK)
   async rollback(@Param('id') id: string): Promise<{ message: string }> {
     await this.processosService.migrarProcesso(id);
     return { message: 'Migração realizada com sucesso! parabéns!!' };
   }
 
-    @Get('completo')              
-  @HttpCode(HttpStatus.OK)
-  async getAllWithPeriodos(): Promise<ProcessoSQL[]> {
-    return this.processosService.findAllWithPeriodos();
-  }
 }

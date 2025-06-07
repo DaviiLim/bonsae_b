@@ -2,43 +2,45 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  OneToOne,
-  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
   BeforeInsert,
   BeforeUpdate,
-  Unique,
 } from 'typeorm';
-import { Processo } from '../../processos/entities/processo.entity';
 import { PeriodoLetivoEnum } from '../enum/periodo-letivo.enum';
-import { BadRequestException } from '@nestjs/common';
 
-@Entity('periodos_letivos')
-@Unique(['processo'])  
-export class PeriodosLetivos {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+@Entity('school_periods')
+export class School_Periods {
+  @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true })
+  id: number;
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', unique: true })
   identificacao: string;
 
-  @OneToOne(() => Processo, { nullable: false, onDelete: 'CASCADE' })// tirar 
-  @JoinColumn({ name: 'processo_id' })
-  processo: Processo;
-
-  @Column({ type: 'enum', enum: PeriodoLetivoEnum })
+  @Column({ type: 'varchar' })
   periodoLetivo: PeriodoLetivoEnum;
 
   @Column({ type: 'date' })
   dataInicial: Date;
 
-  @Column({ type: 'date', name:'mentor' }) //obrigado ! tamujuntu
+  @Column({ type: 'date' })
   dataFim: Date;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt?: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt?: Date;
+
+  @DeleteDateColumn({ name: 'deleted_at' })
+  deletedAt?: Date | null;
 
   @BeforeInsert()
   @BeforeUpdate()
-  checkDates() {
-  if (this.dataFim <= this.dataInicial) {
-    throw new BadRequestException('Data final deve ser após a data inicial.');
+  validateDates() {
+    if (this.dataFim <= this.dataInicial) {
+      throw new Error('Data final deve ser após a data inicial');
+    }
   }
-}
 }

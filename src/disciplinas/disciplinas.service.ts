@@ -90,6 +90,11 @@ export class DisciplinasService {
   }
 
   async buscarProcesso(processoID: string): Promise<Disciplina[]> {
-    return await this.disciplinaModel.find({ processoID })
-  }
+        const processoExiste = await this.disciplinaModel.find({processoID})
+        if (!processoExiste){
+          throw new BadRequestException('Processo não encontrado / não existe !')
+        }
+  
+        return processoExiste;
+      }
 }

@@ -8,11 +8,8 @@ import { Disciplina, DisciplinaDocument } from 'src/disciplinas/schema/disciplin
 import { VinculoAluno, VinculoAlunoDocument } from 'src/vinculos/schema/vinculo-aluno-turma.schema';
 import { VinculoProfessor, VinculoProfessorDocument } from 'src/vinculos/schema/vinculo-professor-turma.schema';
 import { Usuario } from 'src/usuarios/schema/usuarios.schema';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Processo as ProcessoSQL } from './entities/processo.entity';
 import { PeriodosLetivos as PeriodosLetivosSQL } from '../periodos-letivos/entities/periodos-letivo.entity';
-import { DataSource, Repository } from 'typeorm';
-import { ProcessosStatusEnum } from './enum/processosStatus.enum';
+import { DataSource } from 'typeorm';
 import { CreateProcessoDto } from './dto/create-processo.dto';
 
 @Injectable()
@@ -26,7 +23,7 @@ export class ProcessosService {
     @InjectModel(VinculoAluno.name) private readonly vinculoAlunoModel: Model<VinculoAlunoDocument>,
     @InjectModel(VinculoProfessor.name) private readonly vinculoProfessorModel: Model<VinculoProfessorDocument>,
 
-    @InjectRepository(ProcessoSQL) private readonly processoRepository: Repository<ProcessoSQL>,
+
     private readonly dataSource: DataSource,
   ) {}
 
@@ -43,11 +40,10 @@ export class ProcessosService {
     try {
       return await novo.save();
     } catch (err) {
+
       throw new NotFoundException('Falha ao salvar o processo.');
     }
   }
-
-
 
   async find(): Promise<Processo[]> {
     const processos = await this.processoModel.find()
@@ -70,19 +66,6 @@ export class ProcessosService {
     return processo;
   }
 
-  async delete(_id: string): Promise<string> {
-    if (!Types.ObjectId.isValid(_id)) {
-      throw new NotFoundException('ID inválido');
-    }
-
-    const processo = await this.processoModel.findById(_id);
-    if (!processo) throw new NotFoundException('Processo não encontrado');
-
-    await this.processoModel.findByIdAndDelete(_id);
-
-    return 'O processo foi deletado com sucesso !'
-  }
-
   async concluirProcesso(_id: string): Promise<Processo> {
     const existeProcesso = await this.processoModel.findById(_id);
     if (!existeProcesso) {
@@ -100,7 +83,7 @@ export class ProcessosService {
     return atualizado;
   }
 
-  async abortarProcessoNome(_id: string): Promise<Processo> {
+  async abortarProcesso(_id: string): Promise<Processo> {
     const existeProcesso = await this.processoModel.findById(_id);
     if (!existeProcesso) {
       throw new NotFoundException('Processo não encontrado');
@@ -146,7 +129,7 @@ export class ProcessosService {
     };
   }
 
-  async apagarTudo(processoID: string): Promise<string> {
+  async apagarTudo(processoID: string): Promise<string> { // não usar !
   if (!Types.ObjectId.isValid(processoID)) {
     throw new NotFoundException('processoID inválido');
   }
@@ -170,7 +153,7 @@ export class ProcessosService {
   return 'Dados deletados com sucesso. Todos os dados relacionados ao processo foram removidos.';
 }
 
-async migrarProcesso(id: string): Promise<ProcessoSQL> {
+async migrarProcesso(id: string) {
   if (!Types.ObjectId.isValid(id)) {
     throw new NotFoundException('ID inválido.');
   }
@@ -190,21 +173,12 @@ async migrarProcesso(id: string): Promise<ProcessoSQL> {
   await queryRunner.startTransaction();
 
   try {
-    const processoSQL = queryRunner.manager.create(ProcessoSQL, {
-      identificacao: processoMongo.identificacao,
-      status: processoMongo.status as ProcessosStatusEnum,
-      dataInicio: processoMongo.dataInicio,
-      dataFim: processoMongo.dataFim,
-    });
-
-    const processoSalvo = await queryRunner.manager.save(processoSQL);
 
     const periodoSQL = queryRunner.manager.create(PeriodosLetivosSQL, {
       identificacao: periodoMongo.identificacao,
       periodoLetivo: periodoMongo.periodoLetivo,
       dataInicial: periodoMongo.dataInicial,
       dataFim: periodoMongo.dataFim,
-      processo: processoSalvo,
     });
 
     await queryRunner.manager.save(periodoSQL);
@@ -213,14 +187,11 @@ async migrarProcesso(id: string): Promise<ProcessoSQL> {
 
     await this.concluirProcesso(id);
 
-    return processoSalvo;
+    return await this.buscarTudoById(id);
 
   } catch (error) {
     await queryRunner.rollbackTransaction();
-    await this.processoModel.findByIdAndUpdate(id, {
-    status: 'ANDAMENTO',
-    dataFim: null,
-    });
+    await this.abortarProcesso(id)
 
     throw error;
   } finally {
@@ -228,10 +199,5 @@ async migrarProcesso(id: string): Promise<ProcessoSQL> {
   }
 }
 
-  async findAllWithPeriodos(): Promise<ProcessoSQL[]> {
-    return this.processoRepository.find({
-      relations: ['periodos'],     
-    });
-  }
 
 }

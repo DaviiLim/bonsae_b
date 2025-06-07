@@ -95,9 +95,14 @@ async createMany(dto: CreateTurmaArrayDto): Promise<Turma[]> {
     return { message: 'Turma excluída com sucesso.' };
   }
 
-  async buscarProcesso(processoID: string): Promise<Turma[]> {
-  return await this.turmaModel.find({ processoID })
-}
+async buscarProcesso(processoID: string): Promise<Turma[]> {
+      const processoExiste = await this.turmaModel.find({processoID})
+      if (!processoExiste){
+        throw new BadRequestException('Processo não encontrado / não existe !')
+      }
+
+      return processoExiste;
+    }
 
   
 }

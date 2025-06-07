@@ -37,16 +37,21 @@ export class VinculosController {
     await this.vinculosService.delete(id);
   }
 
-  @Get(':id/processos/aluno')
+  @Get('processos/:id/aluno')
   @HttpCode(HttpStatus.OK)
   async buscarProcessoAluno(@Param('id') id: string) {
     return await this.vinculosService.buscarProcessoAluno(id);
   }
 
-  @Get(':id/processo/professor')
+  @Get('processos/:id/professor')
   @HttpCode(HttpStatus.OK)
   async buscarProcessoProfessor(@Param('id') id: string) {
     return await this.vinculosService.buscarProcessoProfessor(id);
+  }
+  @Get('processos/:id')
+  @HttpCode(HttpStatus.OK)
+  async buscarProcesso(@Param('id') id: string) {
+    return await this.vinculosService.buscarProcesso(id);
   }
 
 

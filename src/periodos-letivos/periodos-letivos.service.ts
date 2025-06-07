@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { PeriodosLetivos, PeriodosLetivosDocument } from './schema/periodos-letivos.schema';
@@ -105,7 +105,12 @@ export class PeriodosLetivosService {
   }
 
   async buscarProcesso(processoID: string): Promise<PeriodosLetivos[]> {
-    return await this.periodoLetivoModel.find({ processoID })
-  }
+        const processoExiste = await this.periodoLetivoModel.find({processoID})
+        if (!processoExiste){
+          throw new BadRequestException('Processo não encontrado / não existe !')
+        }
+  
+        return processoExiste;
+      }
 
 }
