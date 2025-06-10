@@ -39,8 +39,8 @@ export class Disciplines {
   @Column({ name:'name', type: 'varchar', nullable: false })
   turma: string;
 
-  @Column({  name:'code', type: 'varchar', nullable: false })
-  codigo: string;
+  @Column({  name:'code', type: 'int', nullable: false })
+  codigo: number;
 
   @Column({
     name:'active',

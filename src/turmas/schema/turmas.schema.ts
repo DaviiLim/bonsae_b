@@ -20,7 +20,7 @@ export class Turma {
   turma: string;
 
   @Prop( {required: true} )
-  codigo: string;
+  codigo: number;
 
 }
 export const TurmaSchema = SchemaFactory.createForClass(Turma);
