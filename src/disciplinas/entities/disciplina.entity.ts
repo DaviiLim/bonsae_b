@@ -1,52 +1,91 @@
-import { 
-  Entity, 
-  PrimaryGeneratedColumn, 
-  Column, 
-  CreateDateColumn, 
-  UpdateDateColumn,
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
   ManyToOne,
-  JoinColumn
+  JoinColumn,
+  DeleteDateColumn,
+  BeforeUpdate,
+  BeforeInsert,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
-import { DisciplinasEstadoEnum } from '../enum/disciplinasEstado.enum';
 import { DisciplinasCategoriaEnum } from '../enum/disciplinasCategoria.enum';
+import { DisciplinasEstadoEnum } from '../enum/disciplinasEstado.enum';
+import { School_Periods } from 'src/periodos-letivos/entities/periodos-letivo.entity';
 
-@Entity('disciplinas')
-export class Disciplina {
-  @PrimaryGeneratedColumn({ unsigned: true, type: 'bigint' })
+@Entity('academic_classes')
+export class AcademicClasses {
+
+  @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true })
   id: number;
 
+  @Column({ name: 'school_period_id', type: 'bigint', unsigned: true, nullable: true })
+  school_period_id?: number; 
+  
+  @ManyToOne(() => School_Periods, schoolPeriod => schoolPeriod.disciplinas)
+  @JoinColumn({ name: 'school_period_id', referencedColumnName: 'id' })
+  periodoLetivo: School_Periods;
 
-  @Column({ name: 'processo_id', type: 'int' })
-  processoId: number;
-
-  @Column({ length: 100, nullable: false })
+  @Column({name:'name', type: 'varchar', length: 255 })
   nome: string;
 
-  @Column({ length: 20, unique: true, nullable: false })
+  @Column({name:'code', type: 'varchar', length: 100, unique: true })
   codigo: string;
 
-  @Column({ name: 'data_inicial', type: 'date', nullable: false })
+  @Column({name:'start_date', type: 'date' })
   dataInicial: Date;
 
-  @Column({ name: 'data_fim', type: 'date', nullable: false })
+  @Column({
+    name:'end_date',
+    type: 'date',
+  })
   dataFim: Date;
 
-  @Column({ 
-    type: 'enum', 
-    enum: DisciplinasCategoriaEnum, 
-    nullable: false 
+  @Column({
+    name:'category',
+    type: 'enum',
+    enum: DisciplinasCategoriaEnum,
   })
   categoria: DisciplinasCategoriaEnum;
 
-  @Column({ name: 'periodo_curricular', length: 50, nullable: true })
+  @Column({ type: 'varchar', nullable: true })
+  course?: string;
+
+  @Column({name:'period', type: 'varchar',nullable: true })
   periodoCurricular?: string;
 
-  @Column({ 
-    type: 'enum', 
-    enum: DisciplinasEstadoEnum
+  @Column({
+    name:'active',
+    type: 'enum',
+    enum: DisciplinasEstadoEnum,
+    default: DisciplinasEstadoEnum.ATIVA,
   })
-  estado?: DisciplinasEstadoEnum;
+  estado: DisciplinasEstadoEnum;
 
-  @Column({ length: 50, nullable: true })
+  @Column({ name: 'is_exceptional', type: 'int', default: 0 })
+  isExceptional?: number;
+
+  @Column({ type: 'varchar', nullable: true })
+  integration?: string;
+
+  @Column({ name:'campus_id', type: 'varchar', nullable: true })
   campus?: string;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
+
+  @DeleteDateColumn({ name: 'deleted_at' })
+    deletedAt?: Date | null;
+  
+  @BeforeInsert()
+  @BeforeUpdate()
+  validateDates() {
+      if (this.dataFim <= this.dataInicial) {
+        throw new Error('Data final deve ser após a data inicial');
+      }
+    }
 }

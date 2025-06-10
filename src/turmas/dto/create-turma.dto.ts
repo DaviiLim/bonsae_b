@@ -22,7 +22,7 @@ export class CreateTurmaDto {
 
   @IsNotEmpty()
   @IsNumber()
-  codigo: number;
+  codigo: string;
 
 }
 

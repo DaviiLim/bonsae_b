@@ -3,7 +3,7 @@ import { DisciplinasCategoriaEnum } from '../enum/disciplinasCategoria.enum';
 import { DisciplinasEstadoEnum } from '../enum/disciplinasEstado.enum';
 import mongoose, { Types } from 'mongoose';
 
-export type DisciplinaDocument = Disciplina & Document;
+export type DisciplinaDocument = Disciplina & Document & { _id: Types.ObjectId }
 
 @Schema({ collection: 'disciplinas' })
 export class Disciplina {

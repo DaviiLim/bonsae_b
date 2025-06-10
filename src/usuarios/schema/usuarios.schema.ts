@@ -2,7 +2,8 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { UsuariosPerfilEnum } from '../enum/usuariosPerfil.enum';
 
-export type UsuarioDocument = Usuario & Document;
+export type UsuarioDocument = Usuario & Document & { _id: Types.ObjectId }
+
 
 @Schema({ collection: 'usuarios' })
 export class Usuario {

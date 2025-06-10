@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 import { ProcessosStatusEnum } from '../enum/processosStatus.enum';
 
-export type ProcessoDocument = Processo & Document;
+export type ProcessoDocument = Processo & Document & { _id: Types.ObjectId }
 
 @Schema({collection: 'processos' })
 export class Processo {

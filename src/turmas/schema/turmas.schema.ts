@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { TurmasTurnoEnum } from "../enum/turmasTurno.enum";
 import { Types } from "mongoose";
 
-export type TurmaDocument = Turma & Document;
+export type TurmaDocument = Turma & Document & { _id: Types.ObjectId }
 
 @Schema({ collection: 'turmas' })
 export class Turma {
@@ -20,7 +20,7 @@ export class Turma {
   turma: string;
 
   @Prop( {required: true} )
-  codigo: number;
+  codigo: string;
 
 }
 export const TurmaSchema = SchemaFactory.createForClass(Turma);

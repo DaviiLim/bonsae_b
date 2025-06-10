@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { PeriodoLetivoEnum } from '../enum/periodo-letivo.enum';
 
-export type PeriodosLetivosDocument = PeriodosLetivos & Document;
+export type PeriodosLetivosDocument = PeriodosLetivos & Document & { _id: Types.ObjectId }
 
 @Schema({ timestamps: true, collection: 'periodos-letivos' })
 export class PeriodosLetivos {

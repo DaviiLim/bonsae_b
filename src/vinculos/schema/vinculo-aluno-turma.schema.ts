@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document, Types } from 'mongoose';
 
-export type VinculoAlunoDocument = VinculoAluno & Document;
+export type VinculoAlunoDocument = VinculoAluno & Document & { _id: Types.ObjectId }
 
 @Schema({ timestamps: true, collection: 'vinculo-alunos' })
 export class VinculoAluno extends Document {
