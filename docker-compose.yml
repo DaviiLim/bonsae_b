@@ -1,46 +1,48 @@
-
+# docker-compose.yml
+version: "3.8" # Versão do Docker Compose
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
+    build: . # Constrói a imagem do seu aplicativo a partir do Dockerfile na pasta atual
     depends_on:
-      - mongo
-      - postgres
-    environment:
-      MONGO_URI: mongodb://mongo:27017/bonsae_db
-      
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USERNAME: admin
-      DB_PASSWORD: admin
-      DB_DATABASE: bonase_DataBase
-    volumes:
-      - .:/app
-      - /app/node_modules
-    command: npm run start:dev
-
-  mongo:
-    image: mongo:latest
+      - postgres # Garante que o PostgreSQL inicie antes do seu aplicativo
+      - mongo # Garante que o MongoDB inicie antes do seu aplicativo
+    env_file:
+      - .env # Carrega as variáveis de ambiente do arquivo .env para o contêiner 'app'
     ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
+      - "3000:3000" # Mapeia a porta 3000 do seu host para a porta 3000 do contêiner 'app'
+    networks:
+      - backend-net # Conecta o serviço 'app' à rede interna 'backend-net'
 
   postgres:
-    image: postgres:13
-    ports:
-      - "5432:5432"
+    image: postgres:13 # Usa a imagem oficial do PostgreSQL versão 13
+    restart: always # O serviço será reiniciado automaticamente se falhar
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: bonase_DataBase
+      POSTGRES_USER: postgres # <-- AQUI! Define o usuário principal do PostgreSQL como 'postgres'
+      POSTGRES_PASSWORD: admin # <-- AQUI! Define a senha para o usuário 'postgres' como 'admin'
+      POSTGRES_DB: bonsae_database # Define o nome do banco de dados inicial
+    ports:
+      - "5432:5432" # Mapeia a porta 5432 do seu host para a porta 5432 do contêiner 'postgres'
+    networks:
+      - backend-net # Conecta o serviço 'postgres' à rede interna 'backend-net'
     volumes:
-      - pg_data:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data # Volume para persistir os dados do PostgreSQL
+      - ./init-postgres:/docker-entrypoint-initdb.d # Opcional: para scripts de inicialização (se você tiver)
+
+  mongo:
+    image: mongo:5.0 # Usa a imagem oficial do MongoDB versão 5.0
+    restart: always # O serviço será reiniciado automaticamente se falhar
+    ports:
+      - "27017:27017" # Mapeia a porta 27017 do seu host para a porta 27017 do contêiner 'mongo'
+    networks:
+      - backend-net # Conecta o serviço 'mongo' à rede interna 'backend-net'
+    volumes:
+      - mongodata:/data/db # Volume para persistir os dados do MongoDB
+
+networks:
+  backend-net:
+    driver: bridge # Define uma rede de ponte para os serviços se comunicarem
 
 volumes:
-  mongo_data:
-  pg_data:
+  pgdata: # Declara o volume nomeado para o PostgreSQL
+  mongodata: # Declara o volume nomeado para o MongoDB
