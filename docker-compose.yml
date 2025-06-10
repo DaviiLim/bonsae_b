@@ -1,48 +1,47 @@
-# docker-compose.yml
-version: "3.8" # Versão do Docker Compose
+version: "3.8"
 
 services:
   app:
-    build: . # Constrói a imagem do seu aplicativo a partir do Dockerfile na pasta atual
+    build: . 
     depends_on:
-      - postgres # Garante que o PostgreSQL inicie antes do seu aplicativo
-      - mongo # Garante que o MongoDB inicie antes do seu aplicativo
+      - postgres 
+      - mongo 
     env_file:
-      - .env # Carrega as variáveis de ambiente do arquivo .env para o contêiner 'app'
+      - .env 
     ports:
-      - "3000:3000" # Mapeia a porta 3000 do seu host para a porta 3000 do contêiner 'app'
+      - "3000:3000" 
     networks:
-      - backend-net # Conecta o serviço 'app' à rede interna 'backend-net'
+      - backend-net 
 
   postgres:
-    image: postgres:13 # Usa a imagem oficial do PostgreSQL versão 13
-    restart: always # O serviço será reiniciado automaticamente se falhar
+    image: postgres:13 
+    restart: always 
     environment:
-      POSTGRES_USER: postgres # <-- AQUI! Define o usuário principal do PostgreSQL como 'postgres'
-      POSTGRES_PASSWORD: admin # <-- AQUI! Define a senha para o usuário 'postgres' como 'admin'
-      POSTGRES_DB: bonsae_database # Define o nome do banco de dados inicial
+      POSTGRES_USER: postgres 
+      POSTGRES_PASSWORD: admin 
+      POSTGRES_DB: bonsae_database 
     ports:
-      - "5432:5432" # Mapeia a porta 5432 do seu host para a porta 5432 do contêiner 'postgres'
+      - "5432:5432"
     networks:
-      - backend-net # Conecta o serviço 'postgres' à rede interna 'backend-net'
+      - backend-net 
     volumes:
-      - pgdata:/var/lib/postgresql/data # Volume para persistir os dados do PostgreSQL
-      - ./init-postgres:/docker-entrypoint-initdb.d # Opcional: para scripts de inicialização (se você tiver)
+      - pgdata:/var/lib/postgresql/data 
+      - ./init-postgres:/docker-entrypoint-initdb.d 
 
   mongo:
-    image: mongo:5.0 # Usa a imagem oficial do MongoDB versão 5.0
-    restart: always # O serviço será reiniciado automaticamente se falhar
+    image: mongo:5.0 
+    restart: always 
     ports:
-      - "27017:27017" # Mapeia a porta 27017 do seu host para a porta 27017 do contêiner 'mongo'
+      - "27017:27017"
     networks:
-      - backend-net # Conecta o serviço 'mongo' à rede interna 'backend-net'
+      - backend-net 
     volumes:
-      - mongodata:/data/db # Volume para persistir os dados do MongoDB
+      - mongodata:/data/db 
 
 networks:
   backend-net:
-    driver: bridge # Define uma rede de ponte para os serviços se comunicarem
+    driver: bridge 
 
 volumes:
-  pgdata: # Declara o volume nomeado para o PostgreSQL
-  mongodata: # Declara o volume nomeado para o MongoDB
+  pgdata: 
+  mongodata: 

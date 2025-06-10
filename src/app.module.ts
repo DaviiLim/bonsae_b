@@ -1,9 +1,9 @@
-// app.module.ts
+
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-// Importe seus outros módulos aqui:
+
 import { PeriodosLetivosModule } from './periodos-letivos/periodos-letivos.module';
 import { DisciplinasModule } from './disciplinas/disciplinas.module';
 import { ProcessosModule } from './processos/processos.module';
@@ -16,10 +16,10 @@ import { VinculosModule } from './vinculos/vinculos.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env', // Garante que o .env seja carregado
+      envFilePath: '.env', 
     }),
 
-    // Configuração do MongoDB (permanece a mesma)
+    // MongoDB 
     MongooseModule.forRootAsync({
       useFactory: async (config: ConfigService) => ({
         uri: config.get<string>('MONGO_URI'),
@@ -27,22 +27,22 @@ import { VinculosModule } from './vinculos/vinculos.module';
       inject: [ConfigService],
     }),
 
-    // Configuração do PostgreSQL (permanece a mesma, lê do .env)
+    // PostgreSQL
     TypeOrmModule.forRootAsync({
       useFactory: async (config: ConfigService) => ({
         type: 'postgres',
         host: config.get('DB_HOST'),
         port: parseInt(config.get<string>('DB_PORT') || '5432'),
-        username: config.get('DB_USERNAME'), // Lendo 'postgres' do .env
-        password: config.get('DB_PASSWORD'), // Lendo 'admin' do .env
+        username: config.get('DB_USERNAME'), 
+        password: config.get('DB_PASSWORD'),
         database: config.get('DB_DATABASE'),
         autoLoadEntities: true,
-        synchronize: true, // CUIDADO em produção: isso pode apagar seus dados!
+        synchronize: true, 
       }),
       inject: [ConfigService],
     }),
 
-    // Seus módulos de aplicação
+    // Módulos
     PeriodosLetivosModule,
     DisciplinasModule,
     ProcessosModule,
