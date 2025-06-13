@@ -3,6 +3,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
+// Importe o AppController e AppService aqui
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+
 import { PeriodosLetivosModule } from './periodos-letivos/periodos-letivos.module';
 import { DisciplinasModule } from './disciplinas/disciplinas.module';
 import { ProcessosModule } from './processos/processos.module';
@@ -30,11 +34,11 @@ import { VinculosModule } from './vinculos/vinculos.module';
         type: 'postgres',
         host: config.get('DB_HOST'),
         port: parseInt(config.get<string>('DB_PORT') || '5432'),
-        username: config.get('DB_USERNAME'), 
+        username: config.get('DB_USERNAME'),
         password: config.get('DB_PASSWORD'),
         database: config.get('DB_DATABASE'),
         autoLoadEntities: true,
-        synchronize: true, 
+        synchronize: true,
       }),
       inject: [ConfigService],
     }),
@@ -46,5 +50,8 @@ import { VinculosModule } from './vinculos/vinculos.module';
     UsuariosModule,
     VinculosModule,
   ],
+
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

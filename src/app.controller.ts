@@ -1,9 +1,12 @@
 import { Controller, Get } from '@nestjs/common';
+import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
+  constructor(private readonly appService: AppService) {}
+
   @Get()
   getHello(): string {
-    return 'Bem-vindo à API Bonsae! A API está online e funcionando.';
+    return this.appService.getHello();
   }
 }
