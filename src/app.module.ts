@@ -1,4 +1,3 @@
-
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -11,38 +10,36 @@ import { TurmasModule } from './turmas/turmas.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { VinculosModule } from './vinculos/vinculos.module';
 
-
 @Module({
   imports: [
+
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env', 
     }),
 
-    // MongoDB 
     MongooseModule.forRootAsync({
       useFactory: async (config: ConfigService) => ({
-        uri: config.get<string>('MONGO_URI'),
+        uri: config.get<string>('MONGO_URL') || config.get<string>('MONGO_URI'),
       }),
       inject: [ConfigService],
     }),
 
-    // PostgreSQL
+ 
     TypeOrmModule.forRootAsync({
       useFactory: async (config: ConfigService) => ({
         type: 'postgres',
-        host: config.get('DB_HOST'),
-        port: parseInt(config.get<string>('DB_PORT') || '5432'),
-        username: config.get('DB_USERNAME'), 
-        password: config.get('DB_PASSWORD'),
-        database: config.get('DB_DATABASE'),
+        host: config.get<string>('PGHOST'),
+        port: parseInt(config.get<string>('PGPORT') || '5432'), 
+        username: config.get<string>('PGUSER'),
+        password: config.get<string>('PGPASSWORD'),
+        database: config.get<string>('PGDATABASE'),
         autoLoadEntities: true,
         synchronize: true, 
       }),
       inject: [ConfigService],
     }),
 
-    // Módulos
     PeriodosLetivosModule,
     DisciplinasModule,
     ProcessosModule,
@@ -50,5 +47,8 @@ import { VinculosModule } from './vinculos/vinculos.module';
     UsuariosModule,
     VinculosModule,
   ],
+ 
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
