@@ -1,98 +1,305 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Project Bonsae (Backend)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+> API REST desenvolvida com Node.js e MongoDB para importação e validação de dados educacionais, utilizada pelo projeto Bonsae.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## 📌 Sobre o Projeto
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+O backend do **Project Bonsae** é responsável por processar, validar, armazenar e retornar dados e erros recebidos por meio de arquivos CSV importados via interface frontend. Cada etapa do processo — como Período Letivo, Disciplinas, Turmas, Usuários e Vínculos — é tratada com regras específicas de validação antes da persistência no banco de dados, mas caso algo dê errado -> ROLLBACK <- !
 
-## Project setup
+Este projeto busca garantir a integridade dos dados, com feedback detalhado para cada importação realizada.
 
-```bash
-$ npm install
-```
+---
 
-## Compile and run the project
+## 🔧 Tecnologias Utilizadas
 
-```bash
-# development
-$ npm run start
+- **Node.js**
+- **Express.js**
+- **MongoDB**
+- **Mongoose**
+- **Cors**
+- **Nodemon**
+- **Dotenv**
 
-# watch mode
-$ npm run start:dev
+---
 
-# production mode
-$ npm run start:prod
-```
+## ⚙️ Instalação & configuração
 
-## Run tests
+1. **Clone o repositório**
+   git clone https://github.com/DaviiLim/bonsae_b.git
 
-```bash
-# unit tests
-$ npm run test
+2. **Instale as dependências**
+   npm install
 
-# e2e tests
-$ npm run test:e2e
+3. **Configure as variáveis de ambiente**
+   Crie um arquivo `.env` com as seguintes chaves:
+   ```env
+   # PostgreSQL
+   DB_HOST=postgres
+   DB_PORT=5432
+   DB_USERNAME=postgres 
+   DB_PASSWORD=admin   
+   DB_DATABASE=bonsae_database
 
-# test coverage
-$ npm run test:cov
-```
+   # MongoDB
+   MONGO_URI=mongodb://mongo:27017/bonsae_db
+   ```
 
-## Deployment
+4. **Suba os containers**
+  
+   docker-compose up --build
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+---
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## 🚀 Funcionalidades da API
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+- faça o POST seguindo esse padrão:
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+  - Processo:
+   {
+    "identificacao": "processo-23"
+   } 
 
-## Resources
+  - Período Letivo:
+  {  
+  "processoID": "6843573a580535d8d8c2c9e1",
+  "identificacao": "2025-1",
+  "periodoLetivo": "SEMESTRE-1",
+  "dataInicial": "2025-01-01T00:00:00.000Z",
+  "dataFim": "2025-06-30T23:59:59.999Z"
+}
 
-Check out a few resources that may come in handy when working with NestJS:
+  - Disciplinas:
+  {
+  "disciplinas": [
+    {
+      "periodoLetivoID": "6843581e580535d8d8c2c9e6",
+      "processoID": "6843573a580535d8d8c2c9e1",
+      "nome": "Anatomia Humana I",
+      "codigo": "BIO101",
+      "dataInicial": "2025-08-01",
+      "dataFim": "2025-12-15",
+      "categoria": "CURSO",
+      "periodoCurricular": "1º semestre",
+      "estado": "ATIVA",
+      "campus": "Campus Norte"
+    },
+    {
+      "periodoLetivoID": "6843581e580535d8d8c2c9e6",
+      "processoID": "6843573a580535d8d8c2c9e1",
+      "nome": "Fisiologia I",
+      "codigo": "BIO102",
+      "dataInicial": "2025-08-01",
+      "dataFim": "2025-12-15",
+      "categoria": "CURSO",
+      "periodoCurricular": "1º semestre",
+      "estado": "ATIVA",
+      "campus": "Campus Norte"
+    },
+    {
+      "periodoLetivoID": "6843581e580535d8d8c2c9e6",
+      "processoID": "6843573a580535d8d8c2c9e1",
+      "nome": "Histologia",
+      "codigo": "BIO103",
+      "dataInicial": "2025-08-01",
+      "dataFim": "2025-12-15",
+      "categoria": "CURSO",
+      "periodoCurricular": "1º semestre",
+      "estado": "ATIVA",
+      "campus": "Campus Norte"
+    },
+    {
+      "periodoLetivoID": "6843581e580535d8d8c2c9e6",
+      "processoID": "6843573a580535d8d8c2c9e1",
+      "nome": "Bioquímica",
+      "codigo": "BIO104",
+      "dataInicial": "2025-08-01",
+      "dataFim": "2025-12-15",
+      "categoria": "CURSO",
+      "periodoCurricular": "2º semestre",
+      "estado": "ATIVA",
+      "campus": "Campus Norte"
+    },
+    {
+      "periodoLetivoID": "6843581e580535d8d8c2c9e6",
+      "processoID": "6843573a580535d8d8c2c9e1",
+      "nome": "Genética Médica",
+      "codigo": "BIO105",
+      "dataInicial": "2025-08-01",
+      "dataFim": "2025-12-15",
+      "categoria": "CURSO",
+      "periodoCurricular": "2º semestre",
+      "estado": "ATIVA",
+      "campus": "Campus Norte"
+    },
+    {
+      "periodoLetivoID": "6843581e580535d8d8c2c9e6",
+      "processoID": "6843573a580535d8d8c2c9e1",
+      "nome": "Imunologia",
+      "codigo": "BIO106",
+      "dataInicial": "2025-08-01",
+      "dataFim": "2025-12-15",
+      "categoria": "CURSO",
+      "periodoCurricular": "2º semestre",
+      "estado": "ATIVA",
+      "campus": "Campus Norte"
+    }
+  ]
+}
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+  - Turmas:
+  {
+  "turmas": [
+    {
+      "disciplinaCodigo": "684358b4580535d8d8c2c9eb",
+      "processoID": "6843573a580535d8d8c2c9e1",
+      "turno": "MANHA",
+      "turma": "Turma A",
+      "codigo": 1001
+    },
+    {
+      "disciplinaCodigo": "684358b4580535d8d8c2c9eb",
+      "processoID": "6843573a580535d8d8c2c9e1",
+      "turno": "NOITE",
+      "turma": "Turma B",
+      "codigo": 1002
+    },
+    {
+      "disciplinaCodigo": "684358b4580535d8d8c2c9ec",
+      "processoID": "6843573a580535d8d8c2c9e1",
+      "turno": "MANHA",
+      "turma": "Turma C",
+      "codigo": 1003
+    },
+    {
+      "disciplinaCodigo": "684358b4580535d8d8c2c9ec",
+      "processoID": "6843573a580535d8d8c2c9e1",
+      "turno": "NOITE",
+      "turma": "Turma D",
+      "codigo": 1004
+    },
+    {
+      "disciplinaCodigo": "684358b4580535d8d8c2c9ed",
+      "processoID": "6843573a580535d8d8c2c9e1",
+      "turno": "MANHA",
+      "turma": "Turma E",
+      "codigo": 1005
+    }
+  ]
+}
 
-## Support
+  - Usuários:
+  {
+  "usuarios": [
+    {
+      "perfil": "ALUNO",
+      "processoID": "6843573a580535d8d8c2c9e1",
+      "nome": "Maria Silva",
+      "email": "maria.silva@example.com",
+      "senha": "senha123",
+      "cpf": "cpf1"
+    },
+    {
+      "perfil": "PROFESSOR",
+      "processoID": "6843573a580535d8d8c2c9e1",
+      "nome": "João Pereira",
+      "email": "joao.pereira@example.com",
+      "senha": "senha123",
+      "cpf": "cpf4"
+    },
+    {
+      "perfil": "ALUNO",
+      "processoID": "6843573a580535d8d8c2c9e1",
+      "nome": "Ana Costa",
+      "email": "ana.costa@example.com",
+      "senha": "senha123",
+      "cpf": "cpf2"
+    },
+    {
+      "perfil": "ALUNO",
+      "processoID": "6843573a580535d8d8c2c9e1",
+      "nome": "Carlos Souza",
+      "email": "carlos.souza@example.com",
+      "senha": "senha123",
+      "cpf": "cpf5"
+    },
+    {
+      "perfil": "PROFESSOR",
+      "processoID": "6843573a580535d8d8c2c9e1",
+      "nome": "Fernanda Lima",
+      "email": "fernanda.lima@example.com",
+      "senha": "senha123",
+      "cpf": "cpf3"
+    }
+  ]
+}
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+  - Vínculos (Alunos e Professores):
+  {  
+    "processoID":"6843573a580535d8d8c2c9e1",
+  "vinculos": [
+    {
+      "email": "ana.costa@example.com",
+      "disciplinaID": "684358b4580535d8d8c2c9f0",
+      "turmaID": "684359c0580535d8d8c2c9f9"
+    },
+    {
+      "email": "joao.pereira@example.com",
+      "disciplinaID": "684358b4580535d8d8c2c9f0",
+      "turmaID": "684359c0580535d8d8c2c9f9"
+    },
+    {
+      "email": "maria.silva@example.com",
+      "disciplinaID": "684358b4580535d8d8c2c9f0",
+      "turmaID": "684359c0580535d8d8c2c9f9"
+    },
+    {
+      "email": "carlos.souza@example.com",
+      "disciplinaID": "684358b4580535d8d8c2c9f0",
+      "turmaID": "684359c0580535d8d8c2c9f9"
+    },
+    {
+      "email": "fernanda.lima@example.com",
+      "disciplinaID": "684358b4580535d8d8c2c9f0",
+      "turmaID": "684359c0580535d8d8c2c9f9"
+    }
+  ]
+}
 
-## Stay in touch
+- utilize esse ENDPOINT para MIGRA para o SQL:
+http://localhost:3000/processos/684acf61fdca30777e12786b <- coloque seu processoID/migrar
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Essa API possui:
+- Suporte a status de importação (pendente, aprovado, rejeitado)
+- Controle de erros e mensagens detalhadas para feedback no front
 
-## License
+---
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+## 🧪 Testes
+
+Atualmente o projeto não possui testes automatizados. Recomenda-se utilizar ferramentas como Postman para testar as rotas e verificar os retornos de validação.
+
+---
+
+## 📋 Checklist da execução
+
+- [ ] Instalar dependências com o npm install
+- [ ] Verificar conexão do DOCKER com os BANCOS e a API (MongoDb e Postgres)
+- [ ] Fazer todos os POST´s
+- [ ] Concluir com a migração para o POSTGRES
+
+---
+
+## 🤝 Equipe
+
+- **Davi Lima** – Backend (autor do repositório)
+- **Caio Jacinto** – Backend
+- **Helena** – Backend 
+
+---
+
+## 🔜 Melhorias Futuras
+
+- Autenticação e autorização (JWT)
+- Testes automatizados (Jest, Supertest)
