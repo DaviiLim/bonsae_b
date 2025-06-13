@@ -14,35 +14,30 @@ import { VinculosModule } from './vinculos/vinculos.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env', 
+      envFilePath: '.env',
     }),
 
-    // --- CONEXÃO MONGO DB ---
     MongooseModule.forRootAsync({
       useFactory: async (config: ConfigService) => ({
-        
         uri: config.get<string>('MONGO_URL') || config.get<string>('MONGO_URI'),
       }),
       inject: [ConfigService],
     }),
 
-    // --- CONEXÃO POSTGRESQL ---
     TypeOrmModule.forRootAsync({
       useFactory: async (config: ConfigService) => ({
         type: 'postgres',
-       
-        host: config.get<string>('PGHOST'),         
-        port: parseInt(config.get<string>('PGPORT') || '5432'), 
-        username: config.get<string>('PGUSER'),     
-        password: config.get<string>('PGPASSWORD'), 
-        database: config.get<string>('PGDATABASE'), 
+        host: config.get<string>('PGHOST'),
+        port: parseInt(config.get<string>('PGPORT') || '5432'),
+        username: config.get<string>('PGUSER'),
+        password: config.get<string>('PGPASSWORD'),
+        database: config.get<string>('PGDATABASE'),
         autoLoadEntities: true,
-        synchronize: true, 
+        synchronize: true,
       }),
       inject: [ConfigService],
     }),
 
-    //  Módulos
     PeriodosLetivosModule,
     DisciplinasModule,
     ProcessosModule,

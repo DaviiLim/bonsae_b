@@ -2,46 +2,48 @@ version: "3.8"
 
 services:
   app:
-    build: . 
+    build:
+      context: .
+      dockerfile: Dockerfile
     depends_on:
-      - postgres 
-      - mongo 
+      - postgres
+      - mongo
     env_file:
-      - .env 
+      - .env
     ports:
-      - "3000:3000" 
+      - "${APP_PORT}:${APP_PORT}"
     networks:
-      - backend-net 
+      - backend-net
 
   postgres:
-    image: postgres:13 
-    restart: always 
+    image: postgres:13
+    restart: always
     environment:
-      POSTGRES_USER: postgres 
-      POSTGRES_PASSWORD: admin 
-      POSTGRES_DB: bonsae_database 
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: bonsae_database
     ports:
       - "5432:5432"
     networks:
-      - backend-net 
+      - backend-net
     volumes:
-      - pgdata:/var/lib/postgresql/data 
-      - ./init-postgres:/docker-entrypoint-initdb.d 
+      - pgdata:/var/lib/postgresql/data
+      - ./pg_hba.conf:/etc/postgresql/pg_hba.conf
 
   mongo:
-    image: mongo:5.0 
-    restart: always 
+    image: mongo:5.0
+    restart: always
     ports:
       - "27017:27017"
     networks:
-      - backend-net 
+      - backend-net
     volumes:
-      - mongodata:/data/db 
+      - mongodata:/data/db
 
 networks:
   backend-net:
-    driver: bridge 
+    driver: bridge
 
 volumes:
-  pgdata: 
-  mongodata: 
+  pgdata:
+  mongodata:
